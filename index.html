@@ -57,18 +57,6 @@
             background-color: #4f46e5; /* indigo-600 */
             color: white;
         }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #4f46e5;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 flex items-center justify-center min-h-screen p-4">
@@ -102,32 +90,16 @@
                  </div>
             </section>
 
-            <!-- NEU: KI-Kartengenerator -->
-            <section id="ai-generator-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
-                <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">✨ KI-Kartengenerator</h2>
-                <p class="text-sm text-slate-600 mb-3">Gib ein Thema ein (z.B. "Obstsorten" oder "unregelmäßige Verben") und lass die KI 10 passende Lernkarten für dich erstellen.</p>
-                <div class="flex gap-2">
-                    <input type="text" id="ai-topic-input" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Thema eingeben...">
-                    <button id="ai-generate-cards-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center min-w-[120px]">
-                        <span class="btn-text">Erstellen</span>
-                        <div class="loader hidden"></div>
-                    </button>
-                </div>
-            </section>
-
             <section id="add-card-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
                 <h2 class="text-2xl font-semibold mb-4">Neue Lernkarte erstellen</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="front" class="block text-sm font-medium text-slate-700 mb-1">Vorderseite (Frage/Begriff)</label>
-                        <textarea id="front" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="z.B. to cope with"></textarea>
+                        <textarea id="front" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="z.B. What does 'bewältigen' mean?"></textarea>
                     </div>
                     <div>
-                        <div class="flex justify-between items-center">
-                            <label for="back" class="block text-sm font-medium text-slate-700 mb-1">Rückseite (Antwort/Definition)</label>
-                            <button id="ai-generate-example-btn" title="Beispielsatz mit KI generieren" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1">✨ Beispiel</button>
-                        </div>
-                        <textarea id="back" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="z.B. bewältigen"></textarea>
+                        <label for="back" class="block text-sm font-medium text-slate-700 mb-1">Rückseite (Antwort/Definition)</label>
+                        <textarea id="back" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="z.B. to cope with, to manage"></textarea>
                     </div>
                 </div>
                 <button id="add-card-btn" class="mt-4 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300">Lernkarte hinzufügen</button>
@@ -150,7 +122,25 @@
         </div>
 
         <div id="study-view" class="hidden">
-            <!-- ... study view unverändert ... -->
+            <h2 id="study-view-title" class="text-3xl font-bold text-center mb-6">Lernmodus</h2>
+            <div id="card-container" class="perspective-1000 mx-auto w-full max-w-xl h-64 mb-6">
+                <div class="card w-full h-full"><div class="card-inner"><div class="card-face card-front"><p id="card-front-text" class="text-2xl text-center"></p></div><div class="card-face card-back"><p id="card-back-text" class="text-xl text-center"></p></div></div></div>
+            </div>
+            <div id="classic-controls" class="flex flex-col items-center gap-4">
+                 <button id="reveal-btn" class="w-full max-w-sm bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">Antwort anzeigen</button>
+                 <div id="assessment-buttons" class="hidden w-full max-w-sm flex gap-4">
+                     <button id="correct-btn" class="w-1/2 bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-colors">Richtig</button>
+                     <button id="incorrect-btn" class="w-1/2 bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 transition-colors">Falsch</button>
+                 </div>
+            </div>
+            <div id="typing-controls" class="flex flex-col items-center gap-4">
+                <input type="text" id="answer-input" class="w-full max-w-sm p-3 border border-slate-300 rounded-lg text-center text-lg" placeholder="Antwort eingeben...">
+                <button id="check-answer-btn" class="w-full max-w-sm bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Prüfen</button>
+                <div id="feedback-container" class="w-full max-w-sm text-center"></div>
+                <button id="next-card-btn" class="hidden w-full max-w-sm bg-slate-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-600">Weiter</button>
+            </div>
+            <button id="back-to-main-btn" class="mt-4 text-slate-600 hover:text-slate-900 font-medium mx-auto block">Zurück zur Übersicht</button>
+            <p id="study-progress" class="text-center mt-4 text-slate-500"></p>
         </div>
         
         <div id="notification-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"><div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-sm w-full"><p id="notification-text" class="text-lg"></p><button id="notification-close-btn" class="mt-4 bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700">OK</button></div></div>
@@ -172,30 +162,24 @@
         let studyDirection = 'both';
 
         // --- DOM-Elemente ---
-        // ... (bestehende DOM-Elemente)
+        const mainView = document.getElementById('main-view');
+        const studyView = document.getElementById('study-view');
         const frontInput = document.getElementById('front');
         const backInput = document.getElementById('back');
         const addCardBtn = document.getElementById('add-card-btn');
-
-        // NEU: KI-Elemente
-        const aiTopicInput = document.getElementById('ai-topic-input');
-        const aiGenerateCardsBtn = document.getElementById('ai-generate-cards-btn');
-        const aiGenerateExampleBtn = document.getElementById('ai-generate-example-btn');
-        
-        // ... (Rest der DOM-Elemente)
-        const mainView = document.getElementById('main-view');
-        const studyView = document.getElementById('study-view');
         const boxesContainer = document.getElementById('boxes-container');
         const cardElement = document.querySelector('.card');
         const cardFrontText = document.getElementById('card-front-text');
         const cardBackText = document.getElementById('card-back-text');
         const studyProgress = document.getElementById('study-progress');
         const backToMainBtn = document.getElementById('back-to-main-btn');
+
         const modeClassicBtn = document.getElementById('mode-classic-btn');
         const modeTypingBtn = document.getElementById('mode-typing-btn');
         const directionBothBtn = document.getElementById('direction-both-btn');
         const directionFrontBtn = document.getElementById('direction-front-btn');
         const directionBackBtn = document.getElementById('direction-back-btn');
+
         const studyViewTitle = document.getElementById('study-view-title');
         const classicControls = document.getElementById('classic-controls');
         const typingControls = document.getElementById('typing-controls');
@@ -207,9 +191,11 @@
         const checkAnswerBtn = document.getElementById('check-answer-btn');
         const feedbackContainer = document.getElementById('feedback-container');
         const nextCardBtn = document.getElementById('next-card-btn');
+        
         const exportJsonBtn = document.getElementById('export-json-btn');
         const importJsonBtn = document.getElementById('import-json-btn');
         const jsonFileInput = document.getElementById('json-file-input');
+        
         const notificationModal = document.getElementById('notification-modal');
         const notificationText = document.getElementById('notification-text');
         const notificationCloseBtn = document.getElementById('notification-close-btn');
@@ -218,33 +204,35 @@
         const confirmYesBtn = document.getElementById('confirm-yes-btn');
         const confirmNoBtn = document.getElementById('confirm-no-btn');
 
-
         // --- Initialisierung & Daten-Management ---
         function initializeApp() {
             loadCardsFromLocalStorage();
             loadSettings();
             setupEventListeners();
         }
-        
-        // ... (bestehende Daten-Management Funktionen)
+
         function loadCardsFromLocalStorage() {
             const storedCards = localStorage.getItem(LOCAL_STORAGE_KEY_CARDS);
             allCards = storedCards ? JSON.parse(storedCards) : [];
             renderBoxes();
         }
+
         function saveCardsToLocalStorage() {
             localStorage.setItem(LOCAL_STORAGE_KEY_CARDS, JSON.stringify(allCards));
         }
+
         function loadSettings() {
             setStudyMode(localStorage.getItem(LOCAL_STORAGE_KEY_MODE) || 'classic');
             setStudyDirection(localStorage.getItem(LOCAL_STORAGE_KEY_DIRECTION) || 'both');
         }
+
         function setStudyMode(mode) {
             studyMode = mode;
             localStorage.setItem(LOCAL_STORAGE_KEY_MODE, mode);
             modeClassicBtn.classList.toggle('active', mode === 'classic');
             modeTypingBtn.classList.toggle('active', mode === 'typing');
         }
+
         function setStudyDirection(direction) {
             studyDirection = direction;
             localStorage.setItem(LOCAL_STORAGE_KEY_DIRECTION, direction);
@@ -252,174 +240,221 @@
             directionFrontBtn.classList.toggle('active', direction === 'front');
             directionBackBtn.classList.toggle('active', direction === 'back');
         }
-        
+
         // --- UI-Funktionen ---
-        function renderBoxes() { /* ... unverändert ... */ }
-        function showNotification(message) { /* ... unverändert ... */ }
-        function showConfirmation(message, callback) { /* ... unverändert ... */ }
-        function switchView(viewName) { /* ... unverändert ... */ }
-        
-        function toggleButtonLoading(button, isLoading) {
-            const textSpan = button.querySelector('.btn-text');
-            const loader = button.querySelector('.loader');
-            if (isLoading) {
-                button.disabled = true;
-                textSpan.classList.add('hidden');
-                loader.classList.remove('hidden');
-            } else {
-                button.disabled = false;
-                textSpan.classList.remove('hidden');
-                loader.classList.add('hidden');
+        function renderBoxes() {
+            boxesContainer.innerHTML = '';
+            const cardCounts = Array(NUM_BOXES).fill(0);
+            allCards.forEach(card => {
+                if(card.box >= 1 && card.box <= NUM_BOXES) cardCounts[card.box - 1]++;
+            });
+            for (let i = 0; i < NUM_BOXES; i++) {
+                const boxIndex = i + 1;
+                const count = cardCounts[i];
+                const boxEl = document.createElement('div');
+                boxEl.className = `p-4 bg-white rounded-lg shadow-md text-center transition-all duration-300 ${count > 0 ? 'cursor-pointer box-shadow-hover' : ''}`;
+                boxEl.innerHTML = `<h3 class="font-bold text-lg text-slate-800">Kasten ${boxIndex}</h3><p class="text-3xl font-semibold my-2 ${count > 0 ? 'text-blue-600' : 'text-slate-400'}">${count}</p><p class="text-sm text-slate-500 mb-4">Karte${count !== 1 ? 'n' : ''}</p><button data-box="${boxIndex}" class="start-study-btn w-full bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" ${count === 0 ? 'disabled' : ''}>Lernen</button>`;
+                boxesContainer.appendChild(boxEl);
             }
         }
-
-        // --- Gemini API Funktionen ---
-        
-        async function generateCardsFromTopic() {
-            const topic = aiTopicInput.value.trim();
-            if (!topic) {
-                showNotification("Bitte gib ein Thema ein.");
-                return;
-            }
-            
-            toggleButtonLoading(aiGenerateCardsBtn, true);
-
-            const prompt = `Generate a list of 10 German-English flashcards for the topic "${topic}". The front should be German and the back should be English.`;
-            
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "ARRAY",
-                        items: {
-                            type: "OBJECT",
-                            properties: {
-                                "front": { "type": "STRING" },
-                                "back": { "type": "STRING" }
-                            },
-                            required: ["front", "back"]
-                        }
-                    }
-                }
-            };
-            const apiKey = ""; // Wird von der Plattform bereitgestellt
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API-Fehler: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
-                    const generatedCards = JSON.parse(result.candidates[0].content.parts[0].text);
-                    let importedCount = 0;
-                    generatedCards.forEach(card => {
-                        if (card.front && card.back) {
-                            allCards.push({ id: (Date.now() + importedCount).toString(), front: card.front, back: card.back, box: 1, createdAt: new Date().toISOString() });
-                            importedCount++;
-                        }
-                    });
-                    saveCardsToLocalStorage();
-                    renderBoxes();
-                    showNotification(`${importedCount} Karten zum Thema "${topic}" wurden erfolgreich erstellt.`);
-                    aiTopicInput.value = '';
-                } else {
-                    throw new Error("Unerwartete API-Antwortstruktur.");
-                }
-            } catch (error) {
-                console.error("Fehler beim Generieren der Karten:", error);
-                showNotification("Ein Fehler ist aufgetreten. Bitte versuche es erneut.");
-            } finally {
-                toggleButtonLoading(aiGenerateCardsBtn, false);
-            }
+        function showNotification(message) {
+            notificationText.textContent = message;
+            notificationModal.classList.remove('hidden');
         }
-
-        async function generateExampleSentence() {
+        function showConfirmation(message, callback) {
+            confirmationText.textContent = message;
+            confirmationCallback = callback;
+            confirmationModal.classList.remove('hidden');
+        }
+        function switchView(viewName) {
+            mainView.classList.toggle('hidden', viewName === 'study');
+            studyView.classList.toggle('hidden', viewName !== 'study');
+        }
+        
+        // --- App-Logik ---
+        function handleAddCard() {
             const front = frontInput.value.trim();
-            const backText = backInput.value.trim();
-            if (!front || !backText) {
-                showNotification("Bitte fülle Vorder- und Rückseite aus, um einen passenden Satz zu generieren.");
-                return;
-            }
+            const back = backInput.value.trim();
+            if (!front || !back) return showNotification("Bitte fülle beide Seiten der Karte aus.");
             
-            showNotification("Generiere Beispielsatz...");
-
-            const prompt = `Create a simple German example sentence using the word or phrase "${front}" (which means "${backText}" in English). Then provide the English translation of that sentence. Format it like this: "German Sentence<br>English Translation"`;
-
-            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            const apiKey = ""; // Wird von der Plattform bereitgestellt
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error(`API-Fehler: ${response.statusText}`);
-                
-                const result = await response.json();
-                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
-                    const example = result.candidates[0].content.parts[0].text.replace(/\n/g, '<br>');
-                    backInput.value += `\n\nBeispiel:\n${example.replace(/<br>/g, '\n')}`;
-                    // Schließe die "Generiere..."-Benachrichtigung
-                    notificationModal.classList.add('hidden');
-                } else {
-                    throw new Error("Unerwartete API-Antwortstruktur.");
-                }
-            } catch (error) {
-                console.error("Fehler beim Generieren des Beispielsatzes:", error);
-                showNotification("Konnte keinen Satz generieren. Bitte versuche es erneut.");
-            }
+            allCards.push({ id: Date.now().toString(), front, back, box: 1, createdAt: new Date().toISOString() });
+            saveCardsToLocalStorage();
+            renderBoxes();
+            frontInput.value = ''; backInput.value = ''; frontInput.focus();
+            showNotification("Lernkarte erfolgreich hinzugefügt!");
         }
 
-        // --- App-Logik (bestehend) ---
-        function handleAddCard() { /* ... unverändert ... */ }
-        function handleExport() { /* ... unverändert ... */ }
-        function handleJsonFileSelect(event) { /* ... unverändert ... */ }
-        function startStudySession(boxNumber) { /* ... unverändert ... */ }
-        function setupStudyViewForMode() { /* ... unverändert ... */ }
-        function showNextStudyItem() { /* ... unverändert ... */ }
-        function updateStudyProgress() { /* ... unverändert ... */ }
-        function moveCard(originalCardId, wasCorrect) { /* ... unverändert ... */ }
-        function handleRevealAnswer() { /* ... unverändert ... */ }
-        function handleClassicAssessment(isCorrect) { /* ... unverändert ... */ }
-        function handleCheckAnswer() { /* ... unverändert ... */ }
+        function handleExport() {
+            if (allCards.length === 0) {
+                return showNotification("Es sind keine Karten zum Exportieren vorhanden.");
+            }
+            const dataStr = JSON.stringify(allCards, null, 2);
+            const dataBlob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'lernkarten-backup.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function handleJsonFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showConfirmation("Achtung! Das Importieren überschreibt deinen gesamten aktuellen Lernstand. Fortfahren?", (confirmed) => {
+                if (confirmed) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const importedData = JSON.parse(e.target.result);
+                            if (Array.isArray(importedData)) {
+                                allCards = importedData;
+                                saveCardsToLocalStorage();
+                                renderBoxes();
+                                showNotification("Lernstand erfolgreich importiert.");
+                            } else { throw new Error("Ungültiges Datenformat."); }
+                        } catch (error) { showNotification("Fehler: Die Datei ist beschädigt oder hat ein falsches Format."); }
+                    };
+                    reader.readAsText(file);
+                }
+                jsonFileInput.value = '';
+            });
+        }
+        
+        function startStudySession(boxNumber) {
+            const cardsInBox = allCards.filter(card => card.box === boxNumber);
+            if (cardsInBox.length === 0) return showNotification(`Kasten ${boxNumber} ist leer.`);
+
+            studyDeck = [];
+            cardsInBox.forEach(originalCard => {
+                if (studyDirection === 'front' || studyDirection === 'both') {
+                    studyDeck.push({ question: originalCard.front, answer: originalCard.back, originalCardId: originalCard.id });
+                }
+                if (studyDirection === 'back' || studyDirection === 'both') {
+                    studyDeck.push({ question: originalCard.back, answer: originalCard.front, originalCardId: originalCard.id });
+                }
+            });
+
+            studyDeck.sort(() => Math.random() - 0.5);
+            
+            setupStudyViewForMode();
+            switchView('study');
+            showNextStudyItem();
+        }
+
+        function setupStudyViewForMode() {
+            const isClassic = studyMode === 'classic';
+            studyViewTitle.textContent = isClassic ? 'Lernmodus: Klassisch' : 'Lernmodus: Schreiben';
+            classicControls.style.display = isClassic ? 'flex' : 'none';
+            typingControls.style.display = isClassic ? 'none' : 'flex';
+        }
+
+        function showNextStudyItem() {
+            cardElement.classList.remove('flipped');
+            feedbackContainer.innerHTML = '';
+            
+            if (studyDeck.length > 0) {
+                currentStudyItem = studyDeck.pop();
+                cardFrontText.textContent = currentStudyItem.question;
+                cardBackText.textContent = currentStudyItem.answer;
+                
+                if (studyMode === 'classic') {
+                    revealBtn.classList.remove('hidden');
+                    assessmentButtons.classList.add('hidden');
+                } else {
+                    answerInput.value = '';
+                    answerInput.disabled = false;
+                    checkAnswerBtn.classList.remove('hidden');
+                    nextCardBtn.classList.add('hidden');
+                    answerInput.focus();
+                }
+                updateStudyProgress();
+            } else {
+                showNotification("Gut gemacht! Du hast alle Karten in diesem Kasten durchgearbeitet.");
+                currentStudyItem = null;
+                renderBoxes();
+                switchView('main');
+            }
+        }
+        
+        function updateStudyProgress() {
+            studyProgress.textContent = `Noch ${studyDeck.length} Abfragen in dieser Sitzung`;
+        }
+        
+        function moveCard(originalCardId, wasCorrect) {
+            const cardIndex = allCards.findIndex(card => card.id === originalCardId);
+            if (cardIndex !== -1) {
+                const currentBox = allCards[cardIndex].box;
+                const newBox = wasCorrect ? Math.min(NUM_BOXES, currentBox + 1) : 1;
+                allCards[cardIndex].box = newBox;
+                saveCardsToLocalStorage();
+            }
+        }
+        
+        function handleRevealAnswer() {
+            cardElement.classList.add('flipped');
+            revealBtn.classList.add('hidden');
+            assessmentButtons.classList.remove('hidden');
+        }
+
+        function handleClassicAssessment(isCorrect) {
+            if (!currentStudyItem) return;
+            moveCard(currentStudyItem.originalCardId, isCorrect);
+            setTimeout(showNextStudyItem, 400);
+        }
+
+        function handleCheckAnswer() {
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = currentStudyItem.answer.trim().toLowerCase();
+            const isCorrect = userAnswer === correctAnswer;
+            
+            cardElement.classList.add('flipped');
+            answerInput.disabled = true;
+            checkAnswerBtn.classList.add('hidden');
+            nextCardBtn.classList.remove('hidden');
+
+            if (isCorrect) {
+                feedbackContainer.innerHTML = `<p class="text-green-600 font-bold">Korrekt!</p>`;
+            } else {
+                feedbackContainer.innerHTML = `<p class="text-red-600 font-bold">Leider falsch.</p><p class="text-sm text-slate-600">Richtige Antwort: ${currentStudyItem.answer}</p>`;
+            }
+
+            moveCard(currentStudyItem.originalCardId, isCorrect);
+        }
 
         // --- Event Listeners ---
         function setupEventListeners() {
-            // Bestehende Listeners
             modeClassicBtn.addEventListener('click', () => setStudyMode('classic'));
             modeTypingBtn.addEventListener('click', () => setStudyMode('typing'));
             directionBothBtn.addEventListener('click', () => setStudyDirection('both'));
             directionFrontBtn.addEventListener('click', () => setStudyDirection('front'));
             directionBackBtn.addEventListener('click', () => setStudyDirection('back'));
+            
             addCardBtn.addEventListener('click', handleAddCard);
             exportJsonBtn.addEventListener('click', handleExport);
             importJsonBtn.addEventListener('click', () => jsonFileInput.click());
             jsonFileInput.addEventListener('change', handleJsonFileSelect);
+
             boxesContainer.addEventListener('click', (e) => {
                 const targetButton = e.target.closest('.start-study-btn');
                 if (targetButton) startStudySession(parseInt(targetButton.dataset.box, 10));
             });
+            
             backToMainBtn.addEventListener('click', () => { currentStudyItem = null; renderBoxes(); switchView('main'); });
+            
             revealBtn.addEventListener('click', handleRevealAnswer);
             correctBtn.addEventListener('click', () => handleClassicAssessment(true));
             incorrectBtn.addEventListener('click', () => handleClassicAssessment(false));
+
             checkAnswerBtn.addEventListener('click', handleCheckAnswer);
             answerInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !checkAnswerBtn.classList.contains('hidden')) handleCheckAnswer();
             });
             nextCardBtn.addEventListener('click', showNextStudyItem);
+            
             notificationCloseBtn.addEventListener('click', () => notificationModal.classList.add('hidden'));
             confirmYesBtn.addEventListener('click', () => {
                 confirmationModal.classList.add('hidden');
@@ -429,31 +464,9 @@
                 confirmationModal.classList.add('hidden');
                 if (confirmationCallback) confirmationCallback(false);
             });
-
-            // NEUE Listeners für KI-Funktionen
-            aiGenerateCardsBtn.addEventListener('click', generateCardsFromTopic);
-            aiGenerateExampleBtn.addEventListener('click', generateExampleSentence);
         }
 
         window.onload = initializeApp;
-
-        // Hilfsfunktionen, um den Code lesbar zu halten (Logik ist oben)
-        renderBoxes.toString = () => '/* ... unverändert ... */';
-        showNotification.toString = () => '/* ... unverändert ... */';
-        showConfirmation.toString = () => '/* ... unverändert ... */';
-        switchView.toString = () => '/* ... unverändert ... */';
-        handleAddCard.toString = () => '/* ... unverändert ... */';
-        handleExport.toString = () => '/* ... unverändert ... */';
-        handleJsonFileSelect.toString = () => '/* ... unverändert ... */';
-        startStudySession.toString = () => '/* ... unverändert ... */';
-        setupStudyViewForMode.toString = () => '/* ... unverändert ... */';
-        showNextStudyItem.toString = () => '/* ... unverändert ... */';
-        updateStudyProgress.toString = () => '/* ... unverändert ... */';
-        moveCard.toString = () => '/* ... unverändert ... */';
-        handleRevealAnswer.toString = () => '/* ... unverändert ... */';
-        handleClassicAssessment.toString = () => '/* ... unverändert ... */';
-        handleCheckAnswer.toString = () => '/* ... unverändert ... */';
-
     </script>
 </body>
 </html>
