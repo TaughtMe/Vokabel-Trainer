@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<link rel="manifest" href="manifest.json">
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -466,7 +467,17 @@
             });
         }
 
-        window.onload = initializeApp;
+        
+        window.onload = () => {
+            initializeApp();
+            
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(() => console.log('Service Worker registriert'))
+                    .catch(err => console.error('Service Worker Fehler:', err));
+            }
+        };
+
     </script>
 </body>
 </html>
