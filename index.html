@@ -182,7 +182,7 @@ weder ausdrücklich noch stillschweigend.
 
     <script type="module">
         // --- VERSION ---
-        const APP_VERSION = "1.6.1";
+        const APP_VERSION = "1.6.2";
         const COPYRIGHT_HOLDER = "[Ihr Name hier]"; // Bitte anpassen
 
         // --- Globale Variablen ---
@@ -216,7 +216,32 @@ weder ausdrücklich noch stillschweigend.
         const addCardBtn = document.getElementById('add-card-btn');
         const boxesContainer = document.getElementById('boxes-container');
         const studyView = document.getElementById('study-view');
-        // ... (weitere DOM-Elemente)
+        const modeClassicBtn = document.getElementById('mode-classic-btn');
+        const modeTypingBtn = document.getElementById('mode-typing-btn');
+        const directionBothBtn = document.getElementById('direction-both-btn');
+        const directionFrontBtn = document.getElementById('direction-front-btn');
+        const directionBackBtn = document.getElementById('direction-back-btn');
+        const studyViewTitle = document.getElementById('study-view-title');
+        const classicControls = document.getElementById('classic-controls');
+        const typingControls = document.getElementById('typing-controls');
+        const revealBtn = document.getElementById('reveal-btn');
+        const assessmentButtons = document.getElementById('assessment-buttons');
+        const correctBtn = document.getElementById('correct-btn');
+        const incorrectBtn = document.getElementById('incorrect-btn');
+        const answerInput = document.getElementById('answer-input');
+        const checkAnswerBtn = document.getElementById('check-answer-btn');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const nextCardBtn = document.getElementById('next-card-btn');
+        const exportJsonBtn = document.getElementById('export-json-btn');
+        const importJsonBtn = document.getElementById('import-json-btn');
+        const jsonFileInput = document.getElementById('json-file-input');
+        const notificationModal = document.getElementById('notification-modal');
+        const notificationText = document.getElementById('notification-text');
+        const notificationCloseBtn = document.getElementById('notification-close-btn');
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const confirmationText = document.getElementById('confirmation-text');
+        const confirmYesBtn = document.getElementById('confirm-yes-btn');
+        const confirmNoBtn = document.getElementById('confirm-no-btn');
 
         // --- Initialisierung & Daten-Management ---
         function initializeApp() {
@@ -266,16 +291,16 @@ weder ausdrücklich noch stillschweigend.
         function setStudyMode(mode) {
             studyMode = mode;
             localStorage.setItem(LOCAL_STORAGE_KEY_MODE, mode);
-            document.getElementById('mode-classic-btn').classList.toggle('active', mode === 'classic');
-            document.getElementById('mode-typing-btn').classList.toggle('active', mode === 'typing');
+            modeClassicBtn.classList.toggle('active', mode === 'classic');
+            modeTypingBtn.classList.toggle('active', mode === 'typing');
         }
 
         function setStudyDirection(direction) {
             studyDirection = direction;
             localStorage.setItem(LOCAL_STORAGE_KEY_DIRECTION, direction);
-            document.getElementById('direction-both-btn').classList.toggle('active', direction === 'both');
-            document.getElementById('direction-front-btn').classList.toggle('active', direction === 'front');
-            document.getElementById('direction-back-btn').classList.toggle('active', direction === 'back');
+            directionBothBtn.classList.toggle('active', direction === 'both');
+            directionFrontBtn.classList.toggle('active', direction === 'front');
+            directionBackBtn.classList.toggle('active', direction === 'back');
         }
 
         // --- UI-Funktionen ---
@@ -319,7 +344,6 @@ weder ausdrücklich noch stillschweigend.
         function renderBoxes() {
             if (!activeDeckId) return;
             const currentDeck = allDecks[activeDeckId];
-            const boxesContainer = document.getElementById('boxes-container');
             boxesContainer.innerHTML = '';
             const cardCounts = Array(NUM_LEVELS).fill(0);
             currentDeck.cards.forEach(card => {
@@ -339,9 +363,19 @@ weder ausdrücklich noch stillschweigend.
             }
         }
         
-        function showNotification(message) { /* ... */ }
-        function showConfirmation(message, callback) { /* ... */ }
-        function switchView(viewName) { /* ... */ }
+        function showNotification(message) {
+            notificationText.textContent = message;
+            notificationModal.classList.remove('hidden');
+        }
+        function showConfirmation(message, callback) {
+            confirmationText.textContent = message;
+            confirmationCallback = callback;
+            confirmationModal.classList.remove('hidden');
+        }
+        function switchView(viewName) {
+            mainView.classList.toggle('hidden', viewName === 'study');
+            studyView.classList.toggle('hidden', viewName !== 'study');
+        }
         
         // --- App-Logik ---
         function handleAddDeck() {
@@ -351,7 +385,6 @@ weder ausdrücklich noch stillschweigend.
             allDecks[newDeckId] = { id: newDeckId, name: name, cards: [] };
             saveDecksToLocalStorage();
             newDeckNameInput.value = '';
-            // KORREKTUR: Nach dem Erstellen direkt zum neuen Stapel wechseln
             showMainView(newDeckId);
         }
 
@@ -445,8 +478,8 @@ weder ausdrücklich noch stillschweigend.
         function setupStudyViewForMode() {
             const isClassic = studyMode === 'classic';
             studyViewTitle.textContent = isClassic ? 'Lernmodus: Klassisch' : 'Lernmodus: Schreiben';
-            document.getElementById('classic-controls').style.display = isClassic ? 'flex' : 'none';
-            document.getElementById('typing-controls').style.display = isClassic ? 'none' : 'flex';
+            classicControls.style.display = isClassic ? 'flex' : 'none';
+            typingControls.style.display = isClassic ? 'none' : 'flex';
         }
 
         function showNextStudyItem() {
@@ -538,11 +571,11 @@ weder ausdrücklich noch stillschweigend.
         
         // --- Event Listeners ---
         function setupEventListeners() {
-            document.getElementById('mode-classic-btn').addEventListener('click', () => setStudyMode('classic'));
-            document.getElementById('mode-typing-btn').addEventListener('click', () => setStudyMode('typing'));
-            document.getElementById('direction-both-btn').addEventListener('click', () => setStudyDirection('both'));
-            document.getElementById('direction-front-btn').addEventListener('click', () => setStudyDirection('front'));
-            document.getElementById('direction-back-btn').addEventListener('click', () => setStudyDirection('back'));
+            modeClassicBtn.addEventListener('click', () => setStudyMode('classic'));
+            modeTypingBtn.addEventListener('click', () => setStudyMode('typing'));
+            directionBothBtn.addEventListener('click', () => setStudyDirection('both'));
+            directionFrontBtn.addEventListener('click', () => setStudyDirection('front'));
+            directionBackBtn.addEventListener('click', () => setStudyDirection('back'));
             
             addDeckBtn.addEventListener('click', handleAddDeck);
             backToDecksBtn.addEventListener('click', showDeckSelectionView);
@@ -561,10 +594,10 @@ weder ausdrücklich noch stillschweigend.
 
             addCardBtn.addEventListener('click', handleAddCard);
             exportJsonBtn.addEventListener('click', handleExport);
-            importJsonBtn.addEventListener('click', () => document.getElementById('json-file-input').click());
-            document.getElementById('json-file-input').addEventListener('change', handleJsonFileSelect);
+            importJsonBtn.addEventListener('click', () => jsonFileInput.click());
+            jsonFileInput.addEventListener('change', handleJsonFileSelect);
 
-            mainView.querySelector('#boxes-container').addEventListener('click', (e) => {
+            boxesContainer.addEventListener('click', (e) => {
                 const targetButton = e.target.closest('.start-study-btn');
                 if (targetButton) startStudySession(parseInt(targetButton.dataset.box, 10));
             });
