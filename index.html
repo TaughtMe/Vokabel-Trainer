@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<link rel="manifest" href="manifest.json">
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Lernkarten-App</title>
+    <link rel="manifest" href="manifest.json">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -161,6 +161,7 @@
         let confirmationCallback = null;
         let studyMode = 'classic';
         let studyDirection = 'both';
+        let totalInSession = 0;
 
         // --- DOM-Elemente ---
         const mainView = document.getElementById('main-view');
@@ -329,17 +330,32 @@
             const cardsInBox = allCards.filter(card => card.box === boxNumber);
             if (cardsInBox.length === 0) return showNotification(`Kasten ${boxNumber} ist leer.`);
 
+            // KORRIGIERTE LOGIK: Stellt sicher, dass jede Karte nur einmal pro Sitzung abgefragt wird.
             studyDeck = [];
             cardsInBox.forEach(originalCard => {
-                if (studyDirection === 'front' || studyDirection === 'both') {
-                    studyDeck.push({ question: originalCard.front, answer: originalCard.back, originalCardId: originalCard.id });
+                let question, answer;
+                if (studyDirection === 'front') {
+                    question = originalCard.front;
+                    answer = originalCard.back;
+                } else if (studyDirection === 'back') {
+                    question = originalCard.back;
+                    answer = originalCard.front;
+                } else { // 'both' direction
+                    // Wählt zufällig eine Richtung für diese eine Abfrage aus
+                    if (Math.random() < 0.5) {
+                        question = originalCard.front;
+                        answer = originalCard.back;
+                    } else {
+                        question = originalCard.back;
+                        answer = originalCard.front;
+                    }
                 }
-                if (studyDirection === 'back' || studyDirection === 'both') {
-                    studyDeck.push({ question: originalCard.back, answer: originalCard.front, originalCardId: originalCard.id });
-                }
+                studyDeck.push({ question, answer, originalCardId: originalCard.id });
             });
 
             studyDeck.sort(() => Math.random() - 0.5);
+            
+            totalInSession = studyDeck.length;
             
             setupStudyViewForMode();
             switchView('study');
@@ -382,7 +398,8 @@
         }
         
         function updateStudyProgress() {
-            studyProgress.textContent = `Noch ${studyDeck.length} Abfragen in dieser Sitzung`;
+            const done = totalInSession - studyDeck.length;
+            studyProgress.textContent = `Karte ${done} von ${totalInSession}`;
         }
         
         function moveCard(originalCardId, wasCorrect) {
@@ -471,10 +488,13 @@
         window.onload = () => {
             initializeApp();
             
-            if ('serviceWorker' in navigator) {
+            // KORRIGIERTE LOGIK: Service Worker nur in sicherer Umgebung registrieren.
+            if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
                 navigator.serviceWorker.register('./service-worker.js')
-                    .then(() => console.log('Service Worker registriert'))
-                    .catch(err => console.error('Service Worker Fehler:', err));
+                    .then(() => console.log('Service Worker erfolgreich registriert.'))
+                    .catch(err => console.error('Fehler bei der Service Worker Registrierung:', err));
+            } else {
+                console.log('Service Worker wird in dieser Umgebung nicht registriert (kein HTTPS oder localhost).');
             }
         };
 
