@@ -64,10 +64,27 @@
 
     <div id="app-container" class="w-full max-w-4xl mx-auto">
         
-        <div id="main-view">
+        <!-- Ansicht für die Stapel-Auswahl -->
+        <div id="deck-selection-view">
             <header class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-slate-900">Lernkarten-App</h1>
-                <p class="text-slate-600 mt-2">Vokabeln lernen nach dem Vokabelkasten-Prinzip</p>
+                <h1 class="text-4xl font-bold text-slate-900">Meine Lernstapel <span id="version-display-decks" class="text-lg align-middle font-normal text-slate-500"></span></h1>
+                <p class="text-slate-600 mt-2">Wähle einen Stapel oder erstelle einen neuen.</p>
+            </header>
+            <div id="deck-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                <!-- Stapel werden hier dynamisch eingefügt -->
+            </div>
+            <div>
+                <input type="text" id="new-deck-name" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Name für neuen Stapel...">
+                <button id="add-deck-btn" class="mt-4 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700">Neuen Stapel erstellen</button>
+            </div>
+        </div>
+
+        <!-- Hauptansicht für einen einzelnen Stapel -->
+        <div id="main-view" class="hidden">
+            <header class="text-center mb-8">
+                <h1 id="deck-title" class="text-4xl font-bold text-slate-900"></h1>
+                <p class="text-slate-600 mt-2">Vokabeln lernen nach dem Level-Prinzip</p>
+                <button id="back-to-decks-btn" class="mt-4 text-blue-600 hover:text-blue-800 font-semibold">&larr; Zur Stapel-Übersicht</button>
             </header>
 
             <section id="settings-section" class="mb-8 p-6 bg-white rounded-xl shadow-md">
@@ -90,40 +107,45 @@
                     </div>
                  </div>
             </section>
+            
+            <!-- NEUE ANORDNUNG: Level-Ansicht -->
+            <section id="boxes-section" class="mb-8">
+                <h2 class="text-2xl font-semibold mb-4 text-center">Deine Lernlevel</h2>
+                <div id="boxes-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
+            </section>
 
+            <!-- NEUE ANORDNUNG: Karten hinzufügen -->
             <section id="add-card-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
                 <h2 class="text-2xl font-semibold mb-4">Neue Lernkarte erstellen</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="front" class="block text-sm font-medium text-slate-700 mb-1">Vorderseite (Frage/Begriff)</label>
-                        <textarea id="front" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="z.B. What does 'bewältigen' mean?"></textarea>
+                        <textarea id="front" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="z.B. What does 'bewältigen' mean?"></textarea>
                     </div>
                     <div>
                         <label for="back" class="block text-sm font-medium text-slate-700 mb-1">Rückseite (Antwort/Definition)</label>
-                        <textarea id="back" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="z.B. to cope with, to manage"></textarea>
+                        <textarea id="back" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="z.B. to cope with, to manage"></textarea>
                     </div>
                 </div>
                 <button id="add-card-btn" class="mt-4 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300">Lernkarte hinzufügen</button>
             </section>
             
+            <!-- NEUE ANORDNUNG: Verwalten -->
             <section id="data-management-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
-                <h2 class="text-2xl font-semibold mb-4">Daten sichern & wiederherstellen</h2>
-                 <p class="text-sm text-slate-600 mb-3">Sichere deinen kompletten Lernstand in einer Datei oder stelle ihn aus einer Sicherung wieder her.</p>
+                <h2 class="text-2xl font-semibold mb-4">Stapel verwalten</h2>
+                 <p class="text-sm text-slate-600 mb-3">Sichere diesen Stapel in einer Datei oder stelle ihn aus einer Sicherung wieder her.</p>
                 <div class="flex gap-4 mt-4">
-                    <button id="export-json-btn" class="w-1/2 bg-orange-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition-colors">Exportieren</button>
-                    <button id="import-json-btn" class="w-1/2 bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">Importieren</button>
+                    <button id="export-json-btn" class="w-1/2 bg-orange-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 transition-colors">Stapel exportieren</button>
+                    <button id="import-json-btn" class="w-1/2 bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">Stapel importieren</button>
                     <input type="file" id="json-file-input" accept=".json" class="hidden"/>
                 </div>
             </section>
 
-            <section id="boxes-section">
-                <h2 class="text-2xl font-semibold mb-4 text-center">Deine Vokabelkästen</h2>
-                <div id="boxes-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
-            </section>
         </div>
 
         <div id="study-view" class="hidden">
-            <h2 id="study-view-title" class="text-3xl font-bold text-center mb-6">Lernmodus</h2>
+             <!-- Study View bleibt strukturell gleich -->
+             <h2 id="study-view-title" class="text-3xl font-bold text-center mb-6">Lernmodus</h2>
             <div id="card-container" class="perspective-1000 mx-auto w-full max-w-xl h-64 mb-6">
                 <div class="card w-full h-full"><div class="card-inner"><div class="card-face card-front"><p id="card-front-text" class="text-2xl text-center"></p></div><div class="card-face card-back"><p id="card-back-text" class="text-xl text-center"></p></div></div></div>
             </div>
@@ -149,13 +171,18 @@
     </div>
 
     <script type="module">
+        // --- VERSION ---
+        const APP_VERSION = "1.5.0";
+
         // --- Globale Variablen ---
-        const NUM_BOXES = 5;
-        const LOCAL_STORAGE_KEY_CARDS = 'flashcardApp_cards';
+        const NUM_LEVELS = 5;
+        const LOCAL_STORAGE_KEY_DECKS = 'flashcardApp_decks';
+        const LOCAL_STORAGE_KEY_LEGACY_CARDS = 'flashcardApp_cards'; // Für Migration
         const LOCAL_STORAGE_KEY_MODE = 'flashcardApp_mode';
         const LOCAL_STORAGE_KEY_DIRECTION = 'flashcardApp_direction';
 
-        let allCards = [];
+        let allDecks = {};
+        let activeDeckId = null;
         let studyDeck = [];
         let currentStudyItem = null;
         let confirmationCallback = null;
@@ -164,8 +191,15 @@
         let totalInSession = 0;
 
         // --- DOM-Elemente ---
+        const versionDisplayDecks = document.getElementById('version-display-decks');
+        const deckSelectionView = document.getElementById('deck-selection-view');
         const mainView = document.getElementById('main-view');
-        const studyView = document.getElementById('study-view');
+        const deckList = document.getElementById('deck-list');
+        const newDeckNameInput = document.getElementById('new-deck-name');
+        const addDeckBtn = document.getElementById('add-deck-btn');
+        const deckTitle = document.getElementById('deck-title');
+        const backToDecksBtn = document.getElementById('back-to-decks-btn');
+        
         const frontInput = document.getElementById('front');
         const backInput = document.getElementById('back');
         const addCardBtn = document.getElementById('add-card-btn');
@@ -174,14 +208,11 @@
         const cardFrontText = document.getElementById('card-front-text');
         const cardBackText = document.getElementById('card-back-text');
         const studyProgress = document.getElementById('study-progress');
-        const backToMainBtn = document.getElementById('back-to-main-btn');
-
         const modeClassicBtn = document.getElementById('mode-classic-btn');
         const modeTypingBtn = document.getElementById('mode-typing-btn');
         const directionBothBtn = document.getElementById('direction-both-btn');
         const directionFrontBtn = document.getElementById('direction-front-btn');
         const directionBackBtn = document.getElementById('direction-back-btn');
-
         const studyViewTitle = document.getElementById('study-view-title');
         const classicControls = document.getElementById('classic-controls');
         const typingControls = document.getElementById('typing-controls');
@@ -193,11 +224,9 @@
         const checkAnswerBtn = document.getElementById('check-answer-btn');
         const feedbackContainer = document.getElementById('feedback-container');
         const nextCardBtn = document.getElementById('next-card-btn');
-        
         const exportJsonBtn = document.getElementById('export-json-btn');
         const importJsonBtn = document.getElementById('import-json-btn');
         const jsonFileInput = document.getElementById('json-file-input');
-        
         const notificationModal = document.getElementById('notification-modal');
         const notificationText = document.getElementById('notification-text');
         const notificationCloseBtn = document.getElementById('notification-close-btn');
@@ -208,19 +237,41 @@
 
         // --- Initialisierung & Daten-Management ---
         function initializeApp() {
-            loadCardsFromLocalStorage();
+            versionDisplayDecks.textContent = `v${APP_VERSION}`;
+            migrateLegacyData();
+            loadDecksFromLocalStorage();
             loadSettings();
             setupEventListeners();
+            showDeckSelectionView();
         }
 
-        function loadCardsFromLocalStorage() {
-            const storedCards = localStorage.getItem(LOCAL_STORAGE_KEY_CARDS);
-            allCards = storedCards ? JSON.parse(storedCards) : [];
-            renderBoxes();
+        function migrateLegacyData() {
+            const legacyCards = localStorage.getItem(LOCAL_STORAGE_KEY_LEGACY_CARDS);
+            const decksExist = localStorage.getItem(LOCAL_STORAGE_KEY_DECKS);
+
+            if (legacyCards && !decksExist) {
+                const cards = JSON.parse(legacyCards);
+                if (Array.isArray(cards) && cards.length > 0) {
+                    const newDeckId = `deck-${Date.now()}`;
+                    allDecks[newDeckId] = {
+                        id: newDeckId,
+                        name: "Meine alten Vokabeln",
+                        cards: cards
+                    };
+                    saveDecksToLocalStorage();
+                    localStorage.removeItem(LOCAL_STORAGE_KEY_LEGACY_CARDS);
+                    showNotification("Deine bisherigen Karten wurden in einen neuen Stapel verschoben.");
+                }
+            }
         }
 
-        function saveCardsToLocalStorage() {
-            localStorage.setItem(LOCAL_STORAGE_KEY_CARDS, JSON.stringify(allCards));
+        function loadDecksFromLocalStorage() {
+            const storedDecks = localStorage.getItem(LOCAL_STORAGE_KEY_DECKS);
+            allDecks = storedDecks ? JSON.parse(storedDecks) : {};
+        }
+
+        function saveDecksToLocalStorage() {
+            localStorage.setItem(LOCAL_STORAGE_KEY_DECKS, JSON.stringify(allDecks));
         }
 
         function loadSettings() {
@@ -244,21 +295,65 @@
         }
 
         // --- UI-Funktionen ---
+        function showDeckSelectionView() {
+            deckSelectionView.classList.remove('hidden');
+            mainView.classList.add('hidden');
+            document.getElementById('study-view')?.classList.add('hidden');
+            renderDeckList();
+        }
+
+        function showMainView(deckId) {
+            activeDeckId = deckId;
+            deckSelectionView.classList.add('hidden');
+            mainView.classList.remove('hidden');
+            deckTitle.textContent = allDecks[deckId].name;
+            renderBoxes();
+        }
+
+        function renderDeckList() {
+            deckList.innerHTML = '';
+            if (Object.keys(allDecks).length === 0) {
+                deckList.innerHTML = `<p class="col-span-full text-center text-slate-500">Noch keine Stapel vorhanden. Erstelle deinen ersten!</p>`;
+                return;
+            }
+            for (const deckId in allDecks) {
+                const deck = allDecks[deckId];
+                const deckEl = document.createElement('div');
+                deckEl.className = 'p-4 bg-white rounded-lg shadow-md cursor-pointer box-shadow-hover flex justify-between items-center';
+                deckEl.dataset.deckId = deck.id;
+                deckEl.innerHTML = `
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">${deck.name}</h3>
+                        <p class="text-sm text-slate-500">${deck.cards.length} Karte${deck.cards.length !== 1 ? 'n' : ''}</p>
+                    </div>
+                    <button data-delete-id="${deck.id}" class="delete-deck-btn text-red-400 hover:text-red-600 p-2 rounded-full text-2xl leading-none">&times;</button>
+                `;
+                deckList.appendChild(deckEl);
+            }
+        }
+
         function renderBoxes() {
+            if (!activeDeckId) return;
+            const currentDeck = allDecks[activeDeckId];
             boxesContainer.innerHTML = '';
-            const cardCounts = Array(NUM_BOXES).fill(0);
-            allCards.forEach(card => {
-                if(card.box >= 1 && card.box <= NUM_BOXES) cardCounts[card.box - 1]++;
+            const cardCounts = Array(NUM_LEVELS).fill(0);
+            currentDeck.cards.forEach(card => {
+                if(card.box >= 1 && card.box <= NUM_LEVELS) cardCounts[card.box - 1]++;
             });
-            for (let i = 0; i < NUM_BOXES; i++) {
+            for (let i = 0; i < NUM_LEVELS; i++) {
                 const boxIndex = i + 1;
                 const count = cardCounts[i];
+                let crownSvg = '';
+                if (boxIndex === 3) { crownSvg = `<svg class="w-6 h-6 mx-auto mb-1" style="color: #CD7F32;" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 01.782.375l3.218 4.125-1.565.625L10 3.812l-2.435 3.313-1.565-.625L9.218 2.375A1 1 0 0110 2zM3.625 8.5l-1.25 1.563L6 14h8l3.625-3.938-1.25-1.562L14.062 10h-1.125L10 7.312 7.062 10H5.938L3.625 8.5zM2 15a1 1 0 00-1 1v1a1 1 0 001 1h16a1 1 0 001-1v-1a1 1 0 00-1-1H2z"></path></svg>`; }
+                else if (boxIndex === 4) { crownSvg = `<svg class="w-6 h-6 mx-auto mb-1" style="color: #C0C0C0;" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 01.782.375l3.218 4.125-1.565.625L10 3.812l-2.435 3.313-1.565-.625L9.218 2.375A1 1 0 0110 2zM3.625 8.5l-1.25 1.563L6 14h8l3.625-3.938-1.25-1.562L14.062 10h-1.125L10 7.312 7.062 10H5.938L3.625 8.5zM2 15a1 1 0 00-1 1v1a1 1 0 001 1h16a1 1 0 001-1v-1a1 1 0 00-1-1H2z"></path></svg>`; }
+                else if (boxIndex === 5) { crownSvg = `<svg class="w-8 h-8 mx-auto mb-1" style="color: #FFD700;" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-3.5-3.5 1.41-1.41L11 14.17l5.59-5.59L18 10l-7 7z"></path><path d="M12 4.44L9.44 6.53 10.85 9.1l-2.6.75L6.53 7.44 4.44 10l2.09 2.56-.75 2.6 2.56-1.41L10 16.15l-2.56 2.09 1.41 2.56 2.6-.75L14.56 18l-1.41-2.56L16.15 14l2.09 2.56 2.56-1.41-.75-2.6L22.56 10l-2.09-2.56 2.56-1.41L18 3.85l-2.56 2.09L12 4.44z" fill="#B9F2FF" stroke="gold" stroke-width="0.5"></path></svg>`; }
                 const boxEl = document.createElement('div');
                 boxEl.className = `p-4 bg-white rounded-lg shadow-md text-center transition-all duration-300 ${count > 0 ? 'cursor-pointer box-shadow-hover' : ''}`;
-                boxEl.innerHTML = `<h3 class="font-bold text-lg text-slate-800">Kasten ${boxIndex}</h3><p class="text-3xl font-semibold my-2 ${count > 0 ? 'text-blue-600' : 'text-slate-400'}">${count}</p><p class="text-sm text-slate-500 mb-4">Karte${count !== 1 ? 'n' : ''}</p><button data-box="${boxIndex}" class="start-study-btn w-full bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" ${count === 0 ? 'disabled' : ''}>Lernen</button>`;
+                boxEl.innerHTML = `<div class="h-8">${crownSvg}</div><h3 class="font-bold text-lg text-slate-800">Level ${boxIndex}</h3><p class="text-3xl font-semibold my-2 ${count > 0 ? 'text-blue-600' : 'text-slate-400'}">${count}</p><p class="text-sm text-slate-500 mb-4">Karte${count !== 1 ? 'n' : ''}</p><button data-box="${boxIndex}" class="start-study-btn w-full bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" ${count === 0 ? 'disabled' : ''}>Lernen</button>`;
                 boxesContainer.appendChild(boxEl);
             }
         }
+        
         function showNotification(message) {
             notificationText.textContent = message;
             notificationModal.classList.remove('hidden');
@@ -270,32 +365,55 @@
         }
         function switchView(viewName) {
             mainView.classList.toggle('hidden', viewName === 'study');
-            studyView.classList.toggle('hidden', viewName !== 'study');
+            document.getElementById('study-view').classList.toggle('hidden', viewName !== 'study');
         }
         
         // --- App-Logik ---
+        function handleAddDeck() {
+            const name = newDeckNameInput.value.trim();
+            if (!name) return showNotification("Bitte gib einen Namen für den neuen Stapel ein.");
+            const newDeckId = `deck-${Date.now()}`;
+            allDecks[newDeckId] = { id: newDeckId, name: name, cards: [] };
+            saveDecksToLocalStorage();
+            renderDeckList();
+            newDeckNameInput.value = '';
+        }
+
+        function handleDeleteDeck(deckId) {
+            const deckName = allDecks[deckId].name;
+            showConfirmation(`Möchtest du den Stapel "${deckName}" wirklich löschen? Alle Karten darin gehen verloren.`, (confirmed) => {
+                if (confirmed) {
+                    delete allDecks[deckId];
+                    saveDecksToLocalStorage();
+                    renderDeckList();
+                }
+            });
+        }
+
         function handleAddCard() {
+            if (!activeDeckId) return;
             const front = frontInput.value.trim();
             const back = backInput.value.trim();
             if (!front || !back) return showNotification("Bitte fülle beide Seiten der Karte aus.");
             
-            allCards.push({ id: Date.now().toString(), front, back, box: 1, createdAt: new Date().toISOString() });
-            saveCardsToLocalStorage();
+            allDecks[activeDeckId].cards.push({ id: Date.now().toString(), front, back, box: 1, createdAt: new Date().toISOString() });
+            saveDecksToLocalStorage();
             renderBoxes();
             frontInput.value = ''; backInput.value = ''; frontInput.focus();
             showNotification("Lernkarte erfolgreich hinzugefügt!");
         }
 
         function handleExport() {
-            if (allCards.length === 0) {
-                return showNotification("Es sind keine Karten zum Exportieren vorhanden.");
-            }
-            const dataStr = JSON.stringify(allCards, null, 2);
+            if (!activeDeckId) return;
+            const deck = allDecks[activeDeckId];
+            if (deck.cards.length === 0) return showNotification("Dieser Stapel ist leer.");
+            
+            const dataStr = JSON.stringify(deck, null, 2);
             const dataBlob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(dataBlob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'lernkarten-backup.json';
+            link.download = `${deck.name.replace(/\s/g, '_')}-backup.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -306,18 +424,19 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            showConfirmation("Achtung! Das Importieren überschreibt deinen gesamten aktuellen Lernstand. Fortfahren?", (confirmed) => {
+            showConfirmation("Achtung! Das Importieren erstellt einen NEUEN Stapel aus der Datei. Fortfahren?", (confirmed) => {
                 if (confirmed) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         try {
-                            const importedData = JSON.parse(e.target.result);
-                            if (Array.isArray(importedData)) {
-                                allCards = importedData;
-                                saveCardsToLocalStorage();
-                                renderBoxes();
-                                showNotification("Lernstand erfolgreich importiert.");
-                            } else { throw new Error("Ungültiges Datenformat."); }
+                            const importedDeck = JSON.parse(e.target.result);
+                            if (importedDeck.id && importedDeck.name && Array.isArray(importedDeck.cards)) {
+                                const newId = `deck-${Date.now()}`;
+                                allDecks[newId] = { ...importedDeck, id: newId };
+                                saveDecksToLocalStorage();
+                                renderDeckList();
+                                showNotification(`Stapel "${importedDeck.name}" erfolgreich importiert.`);
+                            } else { throw new Error("Ungültiges Stapel-Format."); }
                         } catch (error) { showNotification("Fehler: Die Datei ist beschädigt oder hat ein falsches Format."); }
                     };
                     reader.readAsText(file);
@@ -327,34 +446,19 @@
         }
         
         function startStudySession(boxNumber) {
-            const cardsInBox = allCards.filter(card => card.box === boxNumber);
-            if (cardsInBox.length === 0) return showNotification(`Kasten ${boxNumber} ist leer.`);
-
-            // KORRIGIERTE LOGIK: Stellt sicher, dass jede Karte nur einmal pro Sitzung abgefragt wird.
+            if (!activeDeckId) return;
+            const cardsInBox = allDecks[activeDeckId].cards.filter(card => card.box === boxNumber);
+            if (cardsInBox.length === 0) return showNotification(`Level ${boxNumber} ist leer.`);
+            
             studyDeck = [];
             cardsInBox.forEach(originalCard => {
                 let question, answer;
-                if (studyDirection === 'front') {
-                    question = originalCard.front;
-                    answer = originalCard.back;
-                } else if (studyDirection === 'back') {
-                    question = originalCard.back;
-                    answer = originalCard.front;
-                } else { // 'both' direction
-                    // Wählt zufällig eine Richtung für diese eine Abfrage aus
-                    if (Math.random() < 0.5) {
-                        question = originalCard.front;
-                        answer = originalCard.back;
-                    } else {
-                        question = originalCard.back;
-                        answer = originalCard.front;
-                    }
-                }
+                if (studyDirection === 'front') { question = originalCard.front; answer = originalCard.back; }
+                else if (studyDirection === 'back') { question = originalCard.back; answer = originalCard.front; }
+                else { if (Math.random() < 0.5) { question = originalCard.front; answer = originalCard.back; } else { question = originalCard.back; answer = originalCard.front; } }
                 studyDeck.push({ question, answer, originalCardId: originalCard.id });
             });
-
             studyDeck.sort(() => Math.random() - 0.5);
-            
             totalInSession = studyDeck.length;
             
             setupStudyViewForMode();
@@ -370,6 +474,18 @@
         }
 
         function showNextStudyItem() {
+            const studyViewDiv = document.getElementById('study-view');
+            const cardElement = studyViewDiv.querySelector('.card');
+            const feedbackContainer = studyViewDiv.querySelector('#feedback-container');
+            const cardFrontText = studyViewDiv.querySelector('#card-front-text');
+            const cardBackText = studyViewDiv.querySelector('#card-back-text');
+            const revealBtn = studyViewDiv.querySelector('#reveal-btn');
+            const assessmentButtons = studyViewDiv.querySelector('#assessment-buttons');
+            const answerInput = studyViewDiv.querySelector('#answer-input');
+            const checkAnswerBtn = studyViewDiv.querySelector('#check-answer-btn');
+            const nextCardBtn = studyViewDiv.querySelector('#next-card-btn');
+            const studyProgress = studyViewDiv.querySelector('#study-progress');
+
             cardElement.classList.remove('flipped');
             feedbackContainer.innerHTML = '';
             
@@ -388,31 +504,35 @@
                     nextCardBtn.classList.add('hidden');
                     answerInput.focus();
                 }
-                updateStudyProgress();
+                updateStudyProgress(studyProgress);
             } else {
-                showNotification("Gut gemacht! Du hast alle Karten in diesem Kasten durchgearbeitet.");
+                showNotification("Gut gemacht! Du hast alle Karten in diesem Level durchgearbeitet.");
                 currentStudyItem = null;
                 renderBoxes();
                 switchView('main');
             }
         }
         
-        function updateStudyProgress() {
+        function updateStudyProgress(progressEl) {
             const done = totalInSession - studyDeck.length;
-            studyProgress.textContent = `Karte ${done} von ${totalInSession}`;
+            progressEl.textContent = `Karte ${done} von ${totalInSession}`;
         }
         
         function moveCard(originalCardId, wasCorrect) {
-            const cardIndex = allCards.findIndex(card => card.id === originalCardId);
+            if (!activeDeckId) return;
+            const cardIndex = allDecks[activeDeckId].cards.findIndex(card => card.id === originalCardId);
             if (cardIndex !== -1) {
-                const currentBox = allCards[cardIndex].box;
-                const newBox = wasCorrect ? Math.min(NUM_BOXES, currentBox + 1) : 1;
-                allCards[cardIndex].box = newBox;
-                saveCardsToLocalStorage();
+                const currentBox = allDecks[activeDeckId].cards[cardIndex].box;
+                const newBox = wasCorrect ? Math.min(NUM_LEVELS, currentBox + 1) : 1;
+                allDecks[activeDeckId].cards[cardIndex].box = newBox;
+                saveDecksToLocalStorage();
             }
         }
         
         function handleRevealAnswer() {
+            const cardElement = document.querySelector('#study-view .card');
+            const revealBtn = document.getElementById('reveal-btn');
+            const assessmentButtons = document.getElementById('assessment-buttons');
             cardElement.classList.add('flipped');
             revealBtn.classList.add('hidden');
             assessmentButtons.classList.remove('hidden');
@@ -425,6 +545,12 @@
         }
 
         function handleCheckAnswer() {
+            const cardElement = document.querySelector('#study-view .card');
+            const answerInput = document.getElementById('answer-input');
+            const checkAnswerBtn = document.getElementById('check-answer-btn');
+            const nextCardBtn = document.getElementById('next-card-btn');
+            const feedbackContainer = document.getElementById('feedback-container');
+
             const userAnswer = answerInput.value.trim().toLowerCase();
             const correctAnswer = currentStudyItem.answer.trim().toLowerCase();
             const isCorrect = userAnswer === correctAnswer;
@@ -442,7 +568,7 @@
 
             moveCard(currentStudyItem.originalCardId, isCorrect);
         }
-
+        
         // --- Event Listeners ---
         function setupEventListeners() {
             modeClassicBtn.addEventListener('click', () => setStudyMode('classic'));
@@ -451,6 +577,21 @@
             directionFrontBtn.addEventListener('click', () => setStudyDirection('front'));
             directionBackBtn.addEventListener('click', () => setStudyDirection('back'));
             
+            addDeckBtn.addEventListener('click', handleAddDeck);
+            backToDecksBtn.addEventListener('click', showDeckSelectionView);
+            deckList.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.delete-deck-btn');
+                if (deleteBtn) {
+                    e.stopPropagation();
+                    handleDeleteDeck(deleteBtn.dataset.deleteId);
+                    return;
+                }
+                const deckEl = e.target.closest('[data-deck-id]');
+                if (deckEl) {
+                    showMainView(deckEl.dataset.deckId);
+                }
+            });
+
             addCardBtn.addEventListener('click', handleAddCard);
             exportJsonBtn.addEventListener('click', handleExport);
             importJsonBtn.addEventListener('click', () => jsonFileInput.click());
@@ -461,17 +602,17 @@
                 if (targetButton) startStudySession(parseInt(targetButton.dataset.box, 10));
             });
             
-            backToMainBtn.addEventListener('click', () => { currentStudyItem = null; renderBoxes(); switchView('main'); });
+            document.getElementById('back-to-main-btn').addEventListener('click', () => { currentStudyItem = null; renderBoxes(); showMainView(activeDeckId); });
             
-            revealBtn.addEventListener('click', handleRevealAnswer);
-            correctBtn.addEventListener('click', () => handleClassicAssessment(true));
-            incorrectBtn.addEventListener('click', () => handleClassicAssessment(false));
+            document.getElementById('reveal-btn').addEventListener('click', handleRevealAnswer);
+            document.getElementById('correct-btn').addEventListener('click', () => handleClassicAssessment(true));
+            document.getElementById('incorrect-btn').addEventListener('click', () => handleClassicAssessment(false));
 
-            checkAnswerBtn.addEventListener('click', handleCheckAnswer);
-            answerInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !checkAnswerBtn.classList.contains('hidden')) handleCheckAnswer();
+            document.getElementById('check-answer-btn').addEventListener('click', handleCheckAnswer);
+            document.getElementById('answer-input').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !document.getElementById('check-answer-btn').classList.contains('hidden')) handleCheckAnswer();
             });
-            nextCardBtn.addEventListener('click', showNextStudyItem);
+            document.getElementById('next-card-btn').addEventListener('click', showNextStudyItem);
             
             notificationCloseBtn.addEventListener('click', () => notificationModal.classList.add('hidden'));
             confirmYesBtn.addEventListener('click', () => {
@@ -484,11 +625,9 @@
             });
         }
 
-        
         window.onload = () => {
             initializeApp();
             
-            // KORRIGIERTE LOGIK: Service Worker nur in sicherer Umgebung registrieren.
             if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
                 navigator.serviceWorker.register('./service-worker.js')
                     .then(() => console.log('Service Worker erfolgreich registriert.'))
