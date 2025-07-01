@@ -193,7 +193,7 @@ weder ausdrücklich noch stillschweigend.
 
     <script type="module">
         // --- VERSION ---
-        const APP_VERSION = "1.7.2";
+        const APP_VERSION = "1.7.3";
         const COPYRIGHT_HOLDER = "[Ihr Name hier]"; // Bitte anpassen
 
         // --- Globale Variablen ---
@@ -217,6 +217,7 @@ weder ausdrücklich noch stillschweigend.
         const appFooter = document.getElementById('app-footer');
         const deckSelectionView = document.getElementById('deck-selection-view');
         const mainView = document.getElementById('main-view');
+        const studyView = document.getElementById('study-view');
         const deckList = document.getElementById('deck-list');
         const newDeckNameInput = document.getElementById('new-deck-name');
         const addDeckBtn = document.getElementById('add-deck-btn');
@@ -226,13 +227,16 @@ weder ausdrücklich noch stillschweigend.
         const backInput = document.getElementById('back');
         const addCardBtn = document.getElementById('add-card-btn');
         const boxesContainer = document.getElementById('boxes-container');
-        const studyView = document.getElementById('study-view');
         const modeClassicBtn = document.getElementById('mode-classic-btn');
         const modeTypingBtn = document.getElementById('mode-typing-btn');
         const directionBothBtn = document.getElementById('direction-both-btn');
         const directionFrontBtn = document.getElementById('direction-front-btn');
         const directionBackBtn = document.getElementById('direction-back-btn');
         const studyViewTitle = document.getElementById('study-view-title');
+        const cardContainer = document.getElementById('card-container');
+        const cardElement = cardContainer.querySelector('.card');
+        const cardFrontText = document.getElementById('card-front-text');
+        const cardBackText = document.getElementById('card-back-text');
         const classicControls = document.getElementById('classic-controls');
         const typingControls = document.getElementById('typing-controls');
         const revealBtn = document.getElementById('reveal-btn');
@@ -243,6 +247,8 @@ weder ausdrücklich noch stillschweigend.
         const checkAnswerBtn = document.getElementById('check-answer-btn');
         const feedbackContainer = document.getElementById('feedback-container');
         const nextCardBtn = document.getElementById('next-card-btn');
+        const studyProgress = document.getElementById('study-progress');
+        const backToMainBtn = document.getElementById('back-to-main-btn');
         const exportJsonBtn = document.getElementById('export-json-btn');
         const importJsonBtn = document.getElementById('import-json-btn');
         const jsonFileInput = document.getElementById('json-file-input');
@@ -468,6 +474,83 @@ weder ausdrücklich noch stillschweigend.
                 jsonFileInput.value = '';
             });
         }
+
+        function handleCsvImport(event) {
+            const file = event.target.files[0];
+            if (!file || !activeDeckId) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target.result;
+                const rows = text.split(/\r?\n/).filter(row => row.trim() !== '');
+                
+                if (rows.length === 0) {
+                    return showNotification("Die CSV-Datei ist leer oder ungültig.");
+                }
+
+                let importedCount = 0;
+                rows.forEach(row => {
+                    const separatorIndex = row.indexOf(',');
+                    let front, back;
+
+                    if (separatorIndex !== -1) {
+                        front = row.substring(0, separatorIndex).trim();
+                        back = row.substring(separatorIndex + 1).trim();
+                    }
+
+                    if (front && back) {
+                        allDecks[activeDeckId].cards.push({
+                            id: `card-${Date.now()}-${importedCount}`,
+                            front: front,
+                            back: back,
+                            box: 1,
+                            createdAt: new Date().toISOString()
+                        });
+                        importedCount++;
+                    }
+                });
+
+                if (importedCount > 0) {
+                    saveDecksToLocalStorage();
+                    renderBoxes();
+                    showNotification(`${importedCount} Karte(n) erfolgreich zum Stapel hinzugefügt.`);
+                } else {
+                    showNotification("Keine gültigen Karten in der Datei gefunden. Format: Vorderseite,Rückseite");
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+            event.target.value = '';
+        }
+
+        function handleDownloadExample(type) {
+            let content, filename, mimeType;
+            if (type === 'csv') {
+                content = "Vorderseite,Rückseite\ndog,Hund\ncat,Katze";
+                filename = "beispiel.csv";
+                mimeType = "text/csv;charset=utf-8;";
+            } else { // json
+                const exampleDeck = {
+                    id: "deck-beispiel-123",
+                    name: "Beispiel-Stapel",
+                    cards: [
+                        { id: "card-1", front: "the example", back: "das Beispiel", box: 1, createdAt: new Date().toISOString() }
+                    ]
+                };
+                content = JSON.stringify(exampleDeck, null, 2);
+                filename = "beispiel.json";
+                mimeType = "application/json;charset=utf-8;";
+            }
+
+            const blob = new Blob([content], { type: mimeType });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
         
         function startStudySession(boxNumber) {
             if (!activeDeckId) return;
@@ -498,16 +581,6 @@ weder ausdrücklich noch stillschweigend.
         }
 
         function showNextStudyItem() {
-            const cardElement = studyView.querySelector('.card');
-            const feedbackContainer = studyView.querySelector('#feedback-container');
-            const cardFrontText = studyView.querySelector('#card-front-text');
-            const cardBackText = studyView.querySelector('#card-back-text');
-            const revealBtn = studyView.querySelector('#reveal-btn');
-            const assessmentButtons = studyView.querySelector('#assessment-buttons');
-            const answerInput = studyView.querySelector('#answer-input');
-            const checkAnswerBtn = studyView.querySelector('#check-answer-btn');
-            const nextCardBtn = studyView.querySelector('#next-card-btn');
-
             cardElement.classList.remove('flipped');
             feedbackContainer.innerHTML = '';
             
@@ -537,7 +610,7 @@ weder ausdrücklich noch stillschweigend.
         
         function updateStudyProgress() {
             const done = totalInSession - studyDeck.length;
-            studyView.querySelector('#study-progress').textContent = `Karte ${done} von ${totalInSession}`;
+            studyProgress.textContent = `Karte ${done} von ${totalInSession}`;
         }
         
         function moveCard(originalCardId, wasCorrect) {
@@ -552,9 +625,9 @@ weder ausdrücklich noch stillschweigend.
         }
         
         function handleRevealAnswer() {
-            studyView.querySelector('.card').classList.add('flipped');
-            studyView.querySelector('#reveal-btn').classList.add('hidden');
-            studyView.querySelector('#assessment-buttons').classList.remove('hidden');
+            cardElement.classList.add('flipped');
+            revealBtn.classList.add('hidden');
+            assessmentButtons.classList.remove('hidden');
         }
 
         function handleClassicAssessment(isCorrect) {
@@ -564,17 +637,15 @@ weder ausdrücklich noch stillschweigend.
         }
 
         function handleCheckAnswer() {
-            const answerInput = studyView.querySelector('#answer-input');
             const userAnswer = answerInput.value.trim().toLowerCase();
             const correctAnswer = currentStudyItem.answer.trim().toLowerCase();
             const isCorrect = userAnswer === correctAnswer;
             
-            studyView.querySelector('.card').classList.add('flipped');
+            cardElement.classList.add('flipped');
             answerInput.disabled = true;
-            studyView.querySelector('#check-answer-btn').classList.add('hidden');
-            studyView.querySelector('#next-card-btn').classList.remove('hidden');
+            checkAnswerBtn.classList.add('hidden');
+            nextCardBtn.classList.remove('hidden');
 
-            const feedbackContainer = studyView.querySelector('#feedback-container');
             if (isCorrect) {
                 feedbackContainer.innerHTML = `<p class="text-green-600 font-bold">Korrekt!</p>`;
             } else {
@@ -611,23 +682,27 @@ weder ausdrücklich noch stillschweigend.
             exportJsonBtn.addEventListener('click', handleExport);
             importJsonBtn.addEventListener('click', () => jsonFileInput.click());
             jsonFileInput.addEventListener('change', handleJsonFileSelect);
+            importCsvBtn.addEventListener('click', () => csvFileInput.click());
+            csvFileInput.addEventListener('change', handleCsvImport);
+            downloadCsvExampleBtn.addEventListener('click', (e) => { e.preventDefault(); handleDownloadExample('csv'); });
+            downloadJsonExampleBtn.addEventListener('click', (e) => { e.preventDefault(); handleDownloadExample('json'); });
 
             boxesContainer.addEventListener('click', (e) => {
                 const targetButton = e.target.closest('.start-study-btn');
                 if (targetButton) startStudySession(parseInt(targetButton.dataset.box, 10));
             });
             
-            studyView.querySelector('#back-to-main-btn').addEventListener('click', () => { currentStudyItem = null; renderBoxes(); showMainView(activeDeckId); });
+            backToMainBtn.addEventListener('click', () => { currentStudyItem = null; renderBoxes(); showMainView(activeDeckId); });
             
-            studyView.querySelector('#reveal-btn').addEventListener('click', handleRevealAnswer);
-            studyView.querySelector('#correct-btn').addEventListener('click', () => handleClassicAssessment(true));
-            studyView.querySelector('#incorrect-btn').addEventListener('click', () => handleClassicAssessment(false));
+            revealBtn.addEventListener('click', handleRevealAnswer);
+            correctBtn.addEventListener('click', () => handleClassicAssessment(true));
+            incorrectBtn.addEventListener('click', () => handleClassicAssessment(false));
 
-            studyView.querySelector('#check-answer-btn').addEventListener('click', handleCheckAnswer);
-            studyView.querySelector('#answer-input').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !studyView.querySelector('#check-answer-btn').classList.contains('hidden')) handleCheckAnswer();
+            checkAnswerBtn.addEventListener('click', handleCheckAnswer);
+            answerInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !checkAnswerBtn.classList.contains('hidden')) handleCheckAnswer();
             });
-            studyView.querySelector('#next-card-btn').addEventListener('click', showNextStudyItem);
+            nextCardBtn.addEventListener('click', showNextStudyItem);
             
             notificationCloseBtn.addEventListener('click', () => notificationModal.classList.add('hidden'));
             confirmYesBtn.addEventListener('click', () => {
