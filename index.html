@@ -24,10 +24,18 @@ weder ausdrücklich noch stillschweigend.
     -->
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          darkMode: 'class',
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+        }
+        * {
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
         }
         .card-inner {
             position: relative;
@@ -56,10 +64,18 @@ weder ausdrücklich noch stillschweigend.
             background-color: white;
             color: black;
         }
+        .dark .card-front {
+             background-color: #374151; /* gray-700 */
+             color: #f3f4f6; /* gray-100 */
+        }
         .card-back {
             background-color: #f3f4f6;
             color: black;
             transform: rotateY(180deg);
+        }
+        .dark .card-back {
+            background-color: #4b5563; /* gray-600 */
+            color: #f3f4f6; /* gray-100 */
         }
         .box-shadow-hover:hover {
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -70,21 +86,26 @@ weder ausdrücklich noch stillschweigend.
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 flex flex-col min-h-screen p-4">
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col min-h-screen p-4">
 
-    <div id="app-container" class="w-full max-w-4xl mx-auto flex-grow">
+    <div id="app-container" class="w-full max-w-4xl mx-auto flex-grow relative">
         
+        <button id="theme-toggle" class="absolute top-0 right-0 p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <svg id="theme-toggle-dark-icon" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            <svg id="theme-toggle-light-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        </button>
+
         <!-- Ansicht für die Stapel-Auswahl -->
         <div id="deck-selection-view">
             <header class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-slate-900">Meine Lernstapel <span id="version-display-decks" class="text-lg align-middle font-normal text-slate-500"></span></h1>
-                <p class="text-slate-600 mt-2">Wähle einen Stapel oder erstelle einen neuen.</p>
+                <h1 class="text-4xl font-bold text-slate-900 dark:text-slate-100">Meine Lernstapel <span id="version-display-decks" class="text-lg align-middle font-normal text-slate-500"></span></h1>
+                <p class="text-slate-600 dark:text-slate-400 mt-2">Wähle einen Stapel oder erstelle einen neuen.</p>
             </header>
             <div id="deck-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 <!-- Stapel werden hier dynamisch eingefügt -->
             </div>
             <div>
-                <input type="text" id="new-deck-name" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Name für neuen Stapel...">
+                <input type="text" id="new-deck-name" class="w-full p-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Name für neuen Stapel...">
                 <button id="add-deck-btn" class="mt-4 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700">Neuen Stapel erstellen</button>
             </div>
         </div>
@@ -92,24 +113,24 @@ weder ausdrücklich noch stillschweigend.
         <!-- Hauptansicht für einen einzelnen Stapel -->
         <div id="main-view" class="hidden">
             <header class="text-center mb-8">
-                <h1 id="deck-title" class="text-4xl font-bold text-slate-900"></h1>
-                <p class="text-slate-600 mt-2">Vokabeln lernen nach dem Level-Prinzip</p>
-                <button id="back-to-decks-btn" class="mt-4 text-blue-600 hover:text-blue-800 font-semibold">&larr; Zur Stapel-Übersicht</button>
+                <h1 id="deck-title" class="text-4xl font-bold text-slate-900 dark:text-slate-100"></h1>
+                <p class="text-slate-600 dark:text-slate-400 mt-2">Vokabeln lernen nach dem Level-Prinzip</p>
+                <button id="back-to-decks-btn" class="mt-4 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold">&larr; Zur Stapel-Übersicht</button>
             </header>
 
-            <section id="settings-section" class="mb-8 p-6 bg-white rounded-xl shadow-md">
+            <section id="settings-section" class="mb-8 p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md">
                  <h2 class="text-2xl font-semibold mb-4 text-center">Einstellungen</h2>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                          <h3 class="font-semibold text-center mb-2">Lernmodus</h3>
-                         <div class="flex justify-center bg-slate-200 p-1 rounded-lg w-full mx-auto">
+                         <div class="flex justify-center bg-slate-200 dark:bg-slate-700 p-1 rounded-lg w-full mx-auto">
                             <button id="mode-classic-btn" class="option-btn w-1/2 p-2 rounded-md font-semibold transition-colors">Klassisch</button>
                             <button id="mode-typing-btn" class="option-btn w-1/2 p-2 rounded-md font-semibold transition-colors">Schreiben</button>
                         </div>
                     </div>
                     <div>
                         <h3 class="font-semibold text-center mb-2">Lernrichtung</h3>
-                        <div class="flex justify-center bg-slate-200 p-1 rounded-lg w-full mx-auto">
+                        <div class="flex justify-center bg-slate-200 dark:bg-slate-700 p-1 rounded-lg w-full mx-auto">
                             <button id="direction-both-btn" class="option-btn w-1/3 p-2 rounded-md font-semibold transition-colors text-sm">Beide</button>
                             <button id="direction-front-btn" class="option-btn w-1/3 p-2 rounded-md font-semibold transition-colors text-sm">V->R</button>
                             <button id="direction-back-btn" class="option-btn w-1/3 p-2 rounded-md font-semibold transition-colors text-sm">R->V</button>
@@ -123,33 +144,33 @@ weder ausdrücklich noch stillschweigend.
                 <div id="boxes-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"></div>
             </section>
 
-            <section id="add-card-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <section id="add-card-section" class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md mb-8">
                 <h2 class="text-2xl font-semibold mb-4">Neue Lernkarte erstellen</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="front" class="block text-sm font-medium text-slate-700 mb-1">Vorderseite (Frage/Begriff)</label>
-                        <textarea id="front" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="z.B. What does 'bewältigen' mean?"></textarea>
+                        <label for="front" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Vorderseite (Frage/Begriff)</label>
+                        <textarea id="front" rows="3" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="z.B. What does 'bewältigen' mean?"></textarea>
                     </div>
                     <div>
-                        <label for="back" class="block text-sm font-medium text-slate-700 mb-1">Rückseite (Antwort/Definition)</label>
-                        <textarea id="back" rows="3" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="z.B. to cope with, to manage"></textarea>
+                        <label for="back" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Rückseite (Antwort/Definition)</label>
+                        <textarea id="back" rows="3" class="w-full p-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="z.B. to cope with, to manage"></textarea>
                     </div>
                 </div>
                 <button id="add-card-btn" class="mt-4 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300">Lernkarte hinzufügen</button>
             </section>
             
-            <section id="data-management-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <section id="data-management-section" class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md mb-8">
                 <h2 class="text-2xl font-semibold mb-4">Daten & Import/Export</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h3 class="font-semibold text-lg mb-2">Karten aus CSV hinzufügen</h3>
-                        <p class="text-sm text-slate-600 mb-3">Fügt neue Karten aus einer CSV-Datei zu diesem Stapel hinzu. <a href="#" id="download-csv-example" class="text-blue-600 hover:underline">Beispiel herunterladen</a></p>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Fügt neue Karten aus einer CSV-Datei zu diesem Stapel hinzu. <a href="#" id="download-csv-example" class="text-blue-600 dark:text-blue-400 hover:underline">Beispiel herunterladen</a></p>
                         <button id="import-csv-btn" class="w-full bg-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-700">CSV Importieren</button>
                         <input type="file" id="csv-file-input" accept=".csv,.txt" class="hidden"/>
                     </div>
                     <div>
                         <h3 class="font-semibold text-lg mb-2">Stapel-Sicherung</h3>
-                        <p class="text-sm text-slate-600 mb-3">Exportiert oder importiert den kompletten Stapel inkl. Lernfortschritt. <a href="#" id="download-json-example" class="text-blue-600 hover:underline">Beispiel herunterladen</a></p>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Exportiert oder importiert den kompletten Stapel inkl. Lernfortschritt. <a href="#" id="download-json-example" class="text-blue-600 dark:text-blue-400 hover:underline">Beispiel herunterladen</a></p>
                         <div class="flex gap-4">
                             <button id="export-json-btn" class="w-1/2 bg-orange-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600">Export</button>
                             <button id="import-json-btn" class="w-1/2 bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700">Import</button>
@@ -174,7 +195,7 @@ weder ausdrücklich noch stillschweigend.
                  </div>
             </div>
             <div id="typing-controls" class="flex flex-col items-center gap-4">
-                <input type="text" id="answer-input" class="w-full max-w-sm p-3 border border-slate-300 rounded-lg text-center text-lg" placeholder="Antwort eingeben...">
+                <input type="text" id="answer-input" class="w-full max-w-sm p-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-slate-200 rounded-lg text-center text-lg" placeholder="Antwort eingeben...">
                 <button id="check-answer-btn" class="w-full max-w-sm bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Prüfen</button>
                 <div id="feedback-container" class="w-full max-w-sm text-center"></div>
                 <button id="next-card-btn" class="hidden w-full max-w-sm bg-slate-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-600">Weiter</button>
@@ -183,8 +204,13 @@ weder ausdrücklich noch stillschweigend.
             <p id="study-progress" class="text-center mt-4 text-slate-500"></p>
         </div>
         
-        <div id="notification-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"><div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-sm w-full"><p id="notification-text" class="text-lg"></p><button id="notification-close-btn" class="mt-4 bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700">OK</button></div></div>
-        <div id="confirmation-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"><div class="bg-white p-6 rounded-lg shadow-xl text-center max-w-sm w-full"><p id="confirmation-text" class="text-lg mb-4"></p><div class="flex justify-center gap-4"><button id="confirm-yes-btn" class="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700">Ja</button><button id="confirm-no-btn" class="bg-slate-300 text-slate-800 py-2 px-6 rounded-lg hover:bg-slate-400">Nein</button></div></div></div>
+        <div id="notification-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"><div class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl text-center max-w-sm w-full"><p id="notification-text" class="text-lg"></p><button id="notification-close-btn" class="mt-4 bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700">OK</button></div></div>
+        <div id="confirmation-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"><div class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-xl text-center max-w-sm w-full"><p id="confirmation-text" class="text-lg mb-4"></p><div class="flex justify-center gap-4"><button id="confirm-yes-btn" class="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700">Ja</button><button id="confirm-no-btn" class="bg-slate-300 dark:bg-slate-600 text-slate-800 dark:text-slate-200 py-2 px-6 rounded-lg hover:bg-slate-400 dark:hover:bg-slate-500">Nein</button></div></div></div>
+    
+        <div id="update-notification" class="hidden fixed bottom-4 right-4 bg-blue-600 text-white p-4 rounded-lg shadow-lg flex items-center gap-4 z-50">
+            <span>Eine neue Version ist verfügbar!</span>
+            <button id="update-now-btn" class="bg-white text-blue-600 font-bold py-1 px-3 rounded-md hover:bg-blue-100">Aktualisieren</button>
+        </div>
     </div>
     
     <footer id="app-footer" class="text-center p-4 text-xs text-slate-500">
@@ -193,7 +219,7 @@ weder ausdrücklich noch stillschweigend.
 
     <script type="module">
         // --- VERSION ---
-        const APP_VERSION = "1.7.2";
+        const APP_VERSION = "2.0.1";
         const COPYRIGHT_HOLDER = "[Ihr Name hier]"; // Bitte anpassen
 
         // --- Globale Variablen ---
@@ -202,6 +228,7 @@ weder ausdrücklich noch stillschweigend.
         const LOCAL_STORAGE_KEY_LEGACY_CARDS = 'flashcardApp_cards';
         const LOCAL_STORAGE_KEY_MODE = 'flashcardApp_mode';
         const LOCAL_STORAGE_KEY_DIRECTION = 'flashcardApp_direction';
+        const LOCAL_STORAGE_KEY_THEME = 'flashcardApp_theme';
 
         let allDecks = {};
         let activeDeckId = null;
@@ -215,8 +242,12 @@ weder ausdrücklich noch stillschweigend.
         // --- DOM-Elemente ---
         const versionDisplayDecks = document.getElementById('version-display-decks');
         const appFooter = document.getElementById('app-footer');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         const deckSelectionView = document.getElementById('deck-selection-view');
         const mainView = document.getElementById('main-view');
+        const studyView = document.getElementById('study-view');
         const deckList = document.getElementById('deck-list');
         const newDeckNameInput = document.getElementById('new-deck-name');
         const addDeckBtn = document.getElementById('add-deck-btn');
@@ -226,13 +257,16 @@ weder ausdrücklich noch stillschweigend.
         const backInput = document.getElementById('back');
         const addCardBtn = document.getElementById('add-card-btn');
         const boxesContainer = document.getElementById('boxes-container');
-        const studyView = document.getElementById('study-view');
         const modeClassicBtn = document.getElementById('mode-classic-btn');
         const modeTypingBtn = document.getElementById('mode-typing-btn');
         const directionBothBtn = document.getElementById('direction-both-btn');
         const directionFrontBtn = document.getElementById('direction-front-btn');
         const directionBackBtn = document.getElementById('direction-back-btn');
         const studyViewTitle = document.getElementById('study-view-title');
+        const cardContainer = document.getElementById('card-container');
+        const cardElement = cardContainer.querySelector('.card');
+        const cardFrontText = document.getElementById('card-front-text');
+        const cardBackText = document.getElementById('card-back-text');
         const classicControls = document.getElementById('classic-controls');
         const typingControls = document.getElementById('typing-controls');
         const revealBtn = document.getElementById('reveal-btn');
@@ -243,6 +277,8 @@ weder ausdrücklich noch stillschweigend.
         const checkAnswerBtn = document.getElementById('check-answer-btn');
         const feedbackContainer = document.getElementById('feedback-container');
         const nextCardBtn = document.getElementById('next-card-btn');
+        const studyProgress = document.getElementById('study-progress');
+        const backToMainBtn = document.getElementById('back-to-main-btn');
         const exportJsonBtn = document.getElementById('export-json-btn');
         const importJsonBtn = document.getElementById('import-json-btn');
         const jsonFileInput = document.getElementById('json-file-input');
@@ -267,55 +303,89 @@ weder ausdrücklich noch stillschweigend.
             loadSettings();
             setupEventListeners();
             showDeckSelectionView();
+            setupServiceWorker();
         }
 
         function migrateLegacyData() {
-            const legacyCards = localStorage.getItem(LOCAL_STORAGE_KEY_LEGACY_CARDS);
-            const decksExist = localStorage.getItem(LOCAL_STORAGE_KEY_DECKS);
+            try {
+                const legacyCards = localStorage.getItem(LOCAL_STORAGE_KEY_LEGACY_CARDS);
+                const decksExist = localStorage.getItem(LOCAL_STORAGE_KEY_DECKS);
 
-            if (legacyCards && !decksExist) {
-                const cards = JSON.parse(legacyCards);
-                if (Array.isArray(cards) && cards.length > 0) {
-                    const newDeckId = `deck-${Date.now()}`;
-                    allDecks[newDeckId] = {
-                        id: newDeckId,
-                        name: "Meine alten Vokabeln",
-                        cards: cards
-                    };
-                    saveDecksToLocalStorage();
-                    localStorage.removeItem(LOCAL_STORAGE_KEY_LEGACY_CARDS);
-                    showNotification("Deine bisherigen Karten wurden in einen neuen Stapel verschoben.");
+                if (legacyCards && !decksExist) {
+                    const cards = JSON.parse(legacyCards);
+                    if (Array.isArray(cards) && cards.length > 0) {
+                        const newDeckId = `deck-${Date.now()}`;
+                        allDecks[newDeckId] = {
+                            id: newDeckId,
+                            name: "Meine alten Vokabeln",
+                            cards: cards
+                        };
+                        saveDecksToLocalStorage();
+                        localStorage.removeItem(LOCAL_STORAGE_KEY_LEGACY_CARDS);
+                        showNotification("Deine bisherigen Karten wurden in einen neuen Stapel verschoben.");
+                    }
                 }
-            }
+            } catch (e) { console.error("Fehler bei der Datenmigration:", e); }
         }
         
         function loadDecksFromLocalStorage() {
-            const storedDecks = localStorage.getItem(LOCAL_STORAGE_KEY_DECKS);
-            allDecks = storedDecks ? JSON.parse(storedDecks) : {};
+            try {
+                const storedDecks = localStorage.getItem(LOCAL_STORAGE_KEY_DECKS);
+                allDecks = storedDecks ? JSON.parse(storedDecks) : {};
+            } catch (e) { console.error("Fehler beim Laden der Stapel:", e); allDecks = {}; }
         }
 
         function saveDecksToLocalStorage() {
-            localStorage.setItem(LOCAL_STORAGE_KEY_DECKS, JSON.stringify(allDecks));
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEY_DECKS, JSON.stringify(allDecks));
+            } catch (e) { console.error("Fehler beim Speichern der Stapel:", e); }
         }
 
         function loadSettings() {
-            setStudyMode(localStorage.getItem(LOCAL_STORAGE_KEY_MODE) || 'classic');
-            setStudyDirection(localStorage.getItem(LOCAL_STORAGE_KEY_DIRECTION) || 'both');
+            try {
+                setStudyMode(localStorage.getItem(LOCAL_STORAGE_KEY_MODE) || 'classic');
+                setStudyDirection(localStorage.getItem(LOCAL_STORAGE_KEY_DIRECTION) || 'both');
+                loadTheme();
+            } catch (e) { console.error("Fehler beim Laden der Einstellungen:", e); }
         }
 
         function setStudyMode(mode) {
             studyMode = mode;
-            localStorage.setItem(LOCAL_STORAGE_KEY_MODE, mode);
+            try { localStorage.setItem(LOCAL_STORAGE_KEY_MODE, mode); } catch (e) { console.error("Fehler beim Speichern des Lernmodus:", e); }
             modeClassicBtn.classList.toggle('active', mode === 'classic');
             modeTypingBtn.classList.toggle('active', mode === 'typing');
         }
 
         function setStudyDirection(direction) {
             studyDirection = direction;
-            localStorage.setItem(LOCAL_STORAGE_KEY_DIRECTION, direction);
+            try { localStorage.setItem(LOCAL_STORAGE_KEY_DIRECTION, direction); } catch (e) { console.error("Fehler beim Speichern der Lernrichtung:", e); }
             directionBothBtn.classList.toggle('active', direction === 'both');
             directionFrontBtn.classList.toggle('active', direction === 'front');
             directionBackBtn.classList.toggle('active', direction === 'back');
+        }
+
+        function loadTheme() {
+            try {
+                const isDark = localStorage.getItem(LOCAL_STORAGE_KEY_THEME) === 'dark' || 
+                               (!localStorage.getItem(LOCAL_STORAGE_KEY_THEME) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                
+                document.documentElement.classList.toggle('dark', isDark);
+                themeToggleLightIcon.classList.toggle('hidden', isDark);
+                themeToggleDarkIcon.classList.toggle('hidden', !isDark);
+            } catch (e) {
+                console.error("Fehler beim Laden des Themes:", e);
+                themeToggleDarkIcon.classList.remove('hidden');
+                themeToggleLightIcon.classList.add('hidden');
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEY_THEME, isDark ? 'dark' : 'light');
+            } catch (e) { console.error("Fehler beim Speichern des Themes:", e); }
+            themeToggleLightIcon.classList.toggle('hidden', !isDark);
+            themeToggleDarkIcon.classList.toggle('hidden', isDark);
         }
 
         // --- UI-Funktionen ---
@@ -335,31 +405,36 @@ weder ausdrücklich noch stillschweigend.
         }
 
         function renderDeckList() {
-            deckList.innerHTML = '';
+            const fragment = document.createDocumentFragment();
             if (Object.keys(allDecks).length === 0) {
-                deckList.innerHTML = `<p class="col-span-full text-center text-slate-500">Noch keine Stapel vorhanden. Erstelle deinen ersten!</p>`;
-                return;
+                const p = document.createElement('p');
+                p.className = 'col-span-full text-center text-slate-500 dark:text-slate-400';
+                p.textContent = 'Noch keine Stapel vorhanden. Erstelle deinen ersten!';
+                fragment.appendChild(p);
+            } else {
+                for (const deckId in allDecks) {
+                    const deck = allDecks[deckId];
+                    const deckEl = document.createElement('div');
+                    deckEl.className = 'p-4 bg-white dark:bg-slate-800 rounded-lg shadow-md cursor-pointer box-shadow-hover flex justify-between items-center';
+                    deckEl.dataset.deckId = deck.id;
+                    deckEl.innerHTML = `
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">${deck.name}</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">${deck.cards.length} Karte${deck.cards.length !== 1 ? 'n' : ''}</p>
+                        </div>
+                        <button data-delete-id="${deck.id}" class="delete-deck-btn text-red-400 hover:text-red-600 p-2 rounded-full text-2xl leading-none">&times;</button>
+                    `;
+                    fragment.appendChild(deckEl);
+                }
             }
-            for (const deckId in allDecks) {
-                const deck = allDecks[deckId];
-                const deckEl = document.createElement('div');
-                deckEl.className = 'p-4 bg-white rounded-lg shadow-md cursor-pointer box-shadow-hover flex justify-between items-center';
-                deckEl.dataset.deckId = deck.id;
-                deckEl.innerHTML = `
-                    <div>
-                        <h3 class="font-bold text-lg text-slate-800">${deck.name}</h3>
-                        <p class="text-sm text-slate-500">${deck.cards.length} Karte${deck.cards.length !== 1 ? 'n' : ''}</p>
-                    </div>
-                    <button data-delete-id="${deck.id}" class="delete-deck-btn text-red-400 hover:text-red-600 p-2 rounded-full text-2xl leading-none">&times;</button>
-                `;
-                deckList.appendChild(deckEl);
-            }
+            deckList.innerHTML = '';
+            deckList.appendChild(fragment);
         }
 
         function renderBoxes() {
             if (!activeDeckId) return;
             const currentDeck = allDecks[activeDeckId];
-            boxesContainer.innerHTML = '';
+            const fragment = document.createDocumentFragment();
             const cardCounts = Array(NUM_LEVELS).fill(0);
             currentDeck.cards.forEach(card => {
                 if(card.box >= 1 && card.box <= NUM_LEVELS) cardCounts[card.box - 1]++;
@@ -367,15 +442,39 @@ weder ausdrücklich noch stillschweigend.
             for (let i = 0; i < NUM_LEVELS; i++) {
                 const boxIndex = i + 1;
                 const count = cardCounts[i];
-                let crownSvg = '';
-                if (boxIndex === 3) { crownSvg = `<svg class="w-6 h-6 mx-auto mb-1" style="color: #CD7F32;" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 01.782.375l3.218 4.125-1.565.625L10 3.812l-2.435 3.313-1.565-.625L9.218 2.375A1 1 0 0110 2zM3.625 8.5l-1.25 1.563L6 14h8l3.625-3.938-1.25-1.562L14.062 10h-1.125L10 7.312 7.062 10H5.938L3.625 8.5zM2 15a1 1 0 00-1 1v1a1 1 0 001 1h16a1 1 0 001-1v-1a1 1 0 00-1-1H2z"></path></svg>`; }
-                else if (boxIndex === 4) { crownSvg = `<svg class="w-6 h-6 mx-auto mb-1" style="color: #C0C0C0;" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 01.782.375l3.218 4.125-1.565.625L10 3.812l-2.435 3.313-1.565-.625L9.218 2.375A1 1 0 0110 2zM3.625 8.5l-1.25 1.563L6 14h8l3.625-3.938-1.25-1.562L14.062 10h-1.125L10 7.312 7.062 10H5.938L3.625 8.5zM2 15a1 1 0 00-1 1v1a1 1 0 001 1h16a1 1 0 001-1v-1a1 1 0 00-1-1H2z"></path></svg>`; }
-                else if (boxIndex === 5) { crownSvg = `<svg class="w-8 h-8 mx-auto mb-1" style="color: #FFD700;" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-3.5-3.5 1.41-1.41L11 14.17l5.59-5.59L18 10l-7 7z"></path><path d="M12 4.44L9.44 6.53 10.85 9.1l-2.6.75L6.53 7.44 4.44 10l2.09 2.56-.75 2.6 2.56-1.41L10 16.15l-2.56 2.09 1.41 2.56 2.6-.75L14.56 18l-1.41-2.56L16.15 14l2.09 2.56 2.56-1.41-.75-2.6L22.56 10l-2.09-2.56 2.56-1.41L18 3.85l-2.56 2.09L12 4.44z" fill="#B9F2FF" stroke="gold" stroke-width="0.5"></path></svg>`; }
+                let tileBgClasses = 'bg-white dark:bg-slate-800';
+                let textColorClasses = 'text-slate-800 dark:text-slate-200';
+                let countColorClasses = count > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500';
+                let subTextColorClasses = 'text-slate-500 dark:text-slate-400';
+                let buttonClasses = 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400 dark:disabled:text-slate-500';
+
+                if (boxIndex === 3) {
+                    tileBgClasses = 'bg-gradient-to-br from-yellow-600 to-amber-800';
+                    textColorClasses = 'text-white';
+                    countColorClasses = 'text-white';
+                    subTextColorClasses = 'text-amber-100';
+                    buttonClasses = 'bg-white/30 text-white hover:bg-white/50 disabled:bg-white/10 disabled:text-white/50';
+                } else if (boxIndex === 4) {
+                    tileBgClasses = 'bg-gradient-to-br from-slate-400 to-slate-600';
+                    textColorClasses = 'text-white';
+                    countColorClasses = 'text-white';
+                    subTextColorClasses = 'text-slate-100';
+                    buttonClasses = 'bg-white/30 text-white hover:bg-white/50 disabled:bg-white/10 disabled:text-white/50';
+                } else if (boxIndex === 5) {
+                    tileBgClasses = 'bg-gradient-to-br from-amber-400 to-yellow-500';
+                    textColorClasses = 'text-white';
+                    countColorClasses = 'text-white';
+                    subTextColorClasses = 'text-yellow-100';
+                    buttonClasses = 'bg-white/30 text-white hover:bg-white/50 disabled:bg-white/10 disabled:text-white/50';
+                }
+
                 const boxEl = document.createElement('div');
-                boxEl.className = `p-4 bg-white rounded-lg shadow-md text-center transition-all duration-300 ${count > 0 ? 'cursor-pointer box-shadow-hover' : ''}`;
-                boxEl.innerHTML = `<div class="h-8">${crownSvg}</div><h3 class="font-bold text-lg text-slate-800">Level ${boxIndex}</h3><p class="text-3xl font-semibold my-2 ${count > 0 ? 'text-blue-600' : 'text-slate-400'}">${count}</p><p class="text-sm text-slate-500 mb-4">Karte${count !== 1 ? 'n' : ''}</p><button data-box="${boxIndex}" class="start-study-btn w-full bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg transition-colors disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed" ${count === 0 ? 'disabled' : ''}>Lernen</button>`;
-                boxesContainer.appendChild(boxEl);
+                boxEl.className = `p-4 ${tileBgClasses} rounded-lg shadow-md text-center transition-all duration-300 ${count > 0 ? 'cursor-pointer box-shadow-hover' : ''}`;
+                boxEl.innerHTML = `<h3 class="font-bold text-lg ${textColorClasses}">Level ${boxIndex}</h3><p class="text-3xl font-semibold my-2 ${countColorClasses}">${count}</p><p class="text-sm ${subTextColorClasses} mb-4">Karte${count !== 1 ? 'n' : ''}</p><button data-box="${boxIndex}" class="start-study-btn w-full font-semibold py-2 px-4 rounded-lg transition-colors disabled:cursor-not-allowed ${buttonClasses}" ${count === 0 ? 'disabled' : ''}>Lernen</button>`;
+                fragment.appendChild(boxEl);
             }
+            boxesContainer.innerHTML = '';
+            boxesContainer.appendChild(fragment);
         }
         
         function showNotification(message) {
@@ -604,7 +703,7 @@ weder ausdrücklich noch stillschweigend.
         
         function updateStudyProgress() {
             const done = totalInSession - studyDeck.length;
-            studyView.querySelector('#study-progress').textContent = `Karte ${done} von ${totalInSession}`;
+            studyProgress.textContent = `Karte ${done} von ${totalInSession}`;
         }
         
         function moveCard(originalCardId, wasCorrect) {
@@ -619,7 +718,7 @@ weder ausdrücklich noch stillschweigend.
         }
         
         function handleRevealAnswer() {
-            studyView.querySelector('.card').classList.add('flipped');
+            cardElement.classList.add('flipped');
             revealBtn.classList.add('hidden');
             assessmentButtons.classList.remove('hidden');
         }
@@ -635,7 +734,7 @@ weder ausdrücklich noch stillschweigend.
             const correctAnswer = currentStudyItem.answer.trim().toLowerCase();
             const isCorrect = userAnswer === correctAnswer;
             
-            studyView.querySelector('.card').classList.add('flipped');
+            cardElement.classList.add('flipped');
             answerInput.disabled = true;
             checkAnswerBtn.classList.add('hidden');
             nextCardBtn.classList.remove('hidden');
@@ -643,7 +742,7 @@ weder ausdrücklich noch stillschweigend.
             if (isCorrect) {
                 feedbackContainer.innerHTML = `<p class="text-green-600 font-bold">Korrekt!</p>`;
             } else {
-                feedbackContainer.innerHTML = `<p class="text-red-600 font-bold">Leider falsch.</p><p class="text-sm text-slate-600">Richtige Antwort: ${currentStudyItem.answer}</p>`;
+                feedbackContainer.innerHTML = `<p class="text-red-600 font-bold">Leider falsch.</p><p class="text-sm text-slate-600 dark:text-slate-400">Richtige Antwort: ${currentStudyItem.answer}</p>`;
             }
 
             moveCard(currentStudyItem.originalCardId, isCorrect);
@@ -686,7 +785,7 @@ weder ausdrücklich noch stillschweigend.
                 if (targetButton) startStudySession(parseInt(targetButton.dataset.box, 10));
             });
             
-            studyView.querySelector('#back-to-main-btn').addEventListener('click', () => { currentStudyItem = null; renderBoxes(); showMainView(activeDeckId); });
+            backToMainBtn.addEventListener('click', () => { currentStudyItem = null; renderBoxes(); showMainView(activeDeckId); });
             
             revealBtn.addEventListener('click', handleRevealAnswer);
             correctBtn.addEventListener('click', () => handleClassicAssessment(true));
@@ -707,19 +806,51 @@ weder ausdrücklich noch stillschweigend.
                 confirmationModal.classList.add('hidden');
                 if (confirmationCallback) confirmationCallback(false);
             });
+            themeToggleBtn.addEventListener('click', toggleTheme);
         }
 
-        window.onload = () => {
-            initializeApp();
-            
+        // --- Service Worker Logic ---
+        function setupServiceWorker() {
             if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(() => console.log('Service Worker erfolgreich registriert.'))
-                    .catch(err => console.error('Fehler bei der Service Worker Registrierung:', err));
+                navigator.serviceWorker.register('./service-worker.js').then(registration => {
+                    console.log('Service Worker: Registrierung erfolgreich.', registration.scope);
+
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('Service Worker: Neue Version gefunden, wird installiert.', newWorker);
+
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('Service Worker: Neue Version ist zur Aktivierung bereit.');
+                                const updateNotification = document.getElementById('update-notification');
+                                const updateNowBtn = document.getElementById('update-now-btn');
+                                
+                                updateNotification.classList.remove('hidden');
+                                
+                                updateNowBtn.addEventListener('click', () => {
+                                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                                    updateNotification.classList.add('hidden');
+                                });
+                            }
+                        });
+                    });
+                }).catch(error => {
+                    console.error('Service Worker: Fehler bei der Registrierung:', error);
+                });
+
+                let refreshing;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    console.log('Service Worker: Controller hat gewechselt, lade Seite neu.');
+                    window.location.reload();
+                    refreshing = true;
+                });
             } else {
                 console.log('Service Worker wird in dieser Umgebung nicht registriert (kein HTTPS oder localhost).');
             }
-        };
+        }
+
+        window.onload = initializeApp;
 
     </script>
 </body>
